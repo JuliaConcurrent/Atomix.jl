@@ -4,9 +4,6 @@
 @inline invalid_ordering(name::Symbol) =
     ConcurrencyViolationError("invalid ordering: $name")
 
-_JULIA_ORDERINGS =
-    [:unordered, :monotonic, :acquire, :release, :acquire_release, :sequentially_consistent]
-
 let body = foldr(_JULIA_ORDERINGS, init = :(invalid_ordering(order))) do name, ex
         quote
             if order === $(QuoteNode(name))
