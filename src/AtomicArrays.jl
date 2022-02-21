@@ -4,6 +4,8 @@ export AtomicRefArray
 
 import Base
 
+macro atomic end
+
 struct _AtomicRef{T}
     data::Any
     ptr::Ptr{T}
@@ -13,18 +15,23 @@ struct AtomicRefArray{T,N} <: Base.AbstractArray{_AtomicRef{T},N}
     data::Array{T,N}
 end
 
+function asref end
+
 module Internal
 
-import ..AtomicArrays: AtomicRefArray
-using ..AtomicArrays: AtomicArrays
+import ..AtomicArrays: AtomicRefArray, @atomic
+using ..AtomicArrays: AtomicArrays, asref
 
+using Base.Meta: isexpr
 using Base: @propagate_inbounds
 using UnsafeAtomics:
     Ordering, UnsafeAtomics, monotonic, acquire, release, acq_rel, seq_cst, right
 
 const AtomicRef = AtomicArrays._AtomicRef
 
+include("utils.jl")
 include("core.jl")
+include("sugar.jl")
 if isdefined(Base, :replaceproperty!)  # 1.7 or later
     include("properties.jl")
 end

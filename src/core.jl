@@ -68,6 +68,8 @@ end
 end
 =#
 
+@inline AtomicArrays.asref(A::Array) = AtomicRefArray(A)
+
 Base.size(A::AtomicRefArray) = size(A.data)
 
 @propagate_inbounds function Base.getindex(A::AtomicRefArray, i::Int)
