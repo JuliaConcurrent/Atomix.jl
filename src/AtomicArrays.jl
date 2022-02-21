@@ -6,28 +6,28 @@ import Base
 
 macro atomic end
 
-struct _AtomicRef{T}
-    data::Any
-    ptr::Ptr{T}
+struct AtomicRef{T,Ptr,Data}
+    eltype::Base.Val{T}
+    ptr::Ptr
+    data::Data
 end
 
-struct AtomicRefArray{T,N} <: Base.AbstractArray{_AtomicRef{T},N}
-    data::Array{T,N}
+struct AtomicRefArray{T,N,Data<:Base.AbstractArray{T,N}} <:
+       Base.AbstractArray{AtomicRef{T,Data},N}
+    data::Data
 end
 
 function asref end
 
 module Internal
 
-import ..AtomicArrays: AtomicRefArray, @atomic
+import ..AtomicArrays: AtomicRef, AtomicRefArray, @atomic
 using ..AtomicArrays: AtomicArrays, asref
 
 using Base.Meta: isexpr
 using Base: @propagate_inbounds
 using UnsafeAtomics:
     Ordering, UnsafeAtomics, monotonic, acquire, release, acq_rel, seq_cst, right
-
-const AtomicRef = AtomicArrays._AtomicRef
 
 include("utils.jl")
 include("core.jl")

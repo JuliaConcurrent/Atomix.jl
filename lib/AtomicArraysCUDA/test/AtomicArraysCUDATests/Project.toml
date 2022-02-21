@@ -1,0 +1,12 @@
+name = "AtomicArraysCUDATests"
+uuid = "9d3216a9-af1a-4f5a-aafd-8b8ccf229362"
+authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
+version = "0.1.0-DEV"
+
+[deps]
+AtomicArraysCUDA = "004af32d-454c-4810-8025-cf61a147993c"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.6"

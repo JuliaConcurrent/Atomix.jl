@@ -68,14 +68,14 @@ end
 end
 =#
 
-@inline AtomicArrays.asref(A::Array) = AtomicRefArray(A)
+@inline AtomicArrays.asref(A) = AtomicRefArray(A)
 
 Base.size(A::AtomicRefArray) = size(A.data)
 
 @propagate_inbounds function Base.getindex(A::AtomicRefArray, i::Int)
     @boundscheck checkbounds(A, i)
     data = A.data
-    return AtomicRef(data, pointer(data, i))
+    return AtomicRef(Val{eltype(data)}(), pointer(data, i), data)
 end
 
 @inline function UnsafeAtomics.load(ref::AtomicRef, ord::Ordering)
