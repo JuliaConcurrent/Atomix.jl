@@ -71,10 +71,18 @@ end
 @inline AtomicArrays.asref(A) = AtomicRefArray(A)
 
 Base.size(A::AtomicRefArray) = size(A.data)
+Base.IndexStyle(::Type{<:AtomicRefArray{<:Any,<:Any,Data}}) where {Data} = Base.IndexStyle(Data)
 
 @propagate_inbounds function Base.getindex(A::AtomicRefArray, i::Int)
     @boundscheck checkbounds(A, i)
     data = A.data
+    return AtomicRef(Val{eltype(data)}(), pointer(data, i), data)
+end
+
+@propagate_inbounds function Base.getindex(A::AtomicRefArray{<:Any,N}, I::Vararg{Int,N}) where {N}
+    @boundscheck checkbounds(A, I...)
+    data = A.data
+    i = LinearIndices(data)[I...]
     return AtomicRef(Val{eltype(data)}(), pointer(data, i), data)
 end
 
