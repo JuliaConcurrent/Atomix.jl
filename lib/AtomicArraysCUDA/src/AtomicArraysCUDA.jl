@@ -5,8 +5,8 @@ using AtomicArrays: AtomicRef
 using CUDA: CUDA, CuArray, CuDeviceArray
 using UnsafeAtomics: UnsafeAtomics, Ordering
 
-const GenericCuArray{T,N} = Union{CuArray{T,N}, CuDeviceArray{T,N}}
-const CuAtomicRef{T,Ptr,Data <: GenericCuArray} = AtomicRef{T,Ptr,Data}
+const GenericCuArray{T,N} = Union{CuArray{T,N},CuDeviceArray{T,N}}
+const CuAtomicRef{T,Ptr,Data<:GenericCuArray} = AtomicRef{T,Ptr,Data}
 
 function UnsafeAtomics.load(ref::CuAtomicRef{T}, ord::Ordering) where {T}
     error("not implemented")

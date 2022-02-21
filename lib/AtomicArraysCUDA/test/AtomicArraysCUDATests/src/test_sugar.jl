@@ -28,7 +28,7 @@ function test_inc()
     cuda() do
         GC.@preserve A begin
             @atomic A[begin] += 1
-       end
+        end
     end
     @test collect(A) == [2, 1, 1]
 end
