@@ -1,0 +1,12 @@
+name = "AtomicArraysCUDA"
+uuid = "004af32d-454c-4810-8025-cf61a147993c"
+authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
+version = "0.1.0-DEV"
+
+[deps]
+AtomicArrays = "e7abd3ad-702b-465e-9b9c-82c2920774a1"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"
+
+[compat]
+julia = "1.6"
