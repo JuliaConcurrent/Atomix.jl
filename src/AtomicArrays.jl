@@ -5,6 +5,8 @@ export AtomicRefArray
 import Base
 
 macro atomic end
+macro atomicreplace end
+macro atomicswap end
 
 struct AtomicRef{T,Ptr,Data}
     eltype::Base.Val{T}
@@ -21,7 +23,7 @@ function asref end
 
 module Internal
 
-import ..AtomicArrays: AtomicRef, AtomicRefArray, @atomic
+import ..AtomicArrays: AtomicRef, AtomicRefArray, @atomic, @atomicswap, @atomicreplace
 using ..AtomicArrays: AtomicArrays, asref
 
 using Base.Meta: isexpr

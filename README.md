@@ -1,32 +1,28 @@
 # AtomicArrays
 
-```julia
-julia> using AtomicArrays
-
-julia> A = AtomicRefArray(zeros(Int, 3));
-
-julia> ref = A[1];
-
-julia> ref[]
-0
-```
-
-The value of a reference `A[i]` can be updated through the property `._` and
-`@atomic*` API provided by Julia ≥ 1.7.
+AtomicArrays.jl have `@atomic`, `@atomicswap`, and `@atomicreplace` that are
+superset of the macros in Base.jl.  In addition to atomic operations on the
+fields, they support atomic operations on
 
 ```julia
-julia> @atomic A[1]._
-0
+julia> using AtomicArrays: @atomic, @atomicswap, @atomicreplace
 
-julia> @atomic A[1]._ += 1
-1
+julia> A = ones(Int, 3);
 
-julia> @atomicreplace A[1]._ 1 => 2
-(old = 1, success = true)
+julia> @atomic A[1] += 1;  # fetch-and-increment
 
-julia> @atomicswap A[1]._ = 3
+julia> @atomic A[1]
 2
 
-julia> @atomic A[1]._
-3
+julia> @atomicreplace A[begin+1] 1 => 42  # compare-and-swap
+(old = 1, success = true)
+
+julia> @inbounds @atomic :monotonic A[begin+1]  # specify ordering and skip bound check
+42
+
+julia> @atomicswap A[end] = 123
+1
+
+julia> A[end]
+123
 ```

@@ -86,13 +86,6 @@ end
     return AtomicRef(Val{eltype(data)}(), pointer(data, i), data)
 end
 
-@propagate_inbounds function Base.getindex(A::AtomicRefArray{<:Any,N}, I::Vararg{Int,N}) where {N}
-    @boundscheck checkbounds(A, I...)
-    data = A.data
-    i = LinearIndices(data)[I...]
-    return AtomicRef(Val{eltype(data)}(), pointer(data, i), data)
-end
-
 @inline function UnsafeAtomics.load(ref::AtomicRef, ord::Ordering)
     ptr = ref.ptr
     data = ref.data
