@@ -1,8 +1,9 @@
 # AtomicArrays
 
 AtomicArrays.jl implements `@atomic`, `@atomicswap`, and `@atomicreplace` that
-are superset of the macros in Base.jl.  In addition to atomic operations on the
-fields, they support atomic operations on array elements.
+are superset of the macros in `Base`.  In addition to atomic operations on the
+fields as implemented in `Base`, they support atomic operations on array
+elements.
 
 ```julia
 julia> using AtomicArrays: @atomic, @atomicswap, @atomicreplace
