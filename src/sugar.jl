@@ -144,10 +144,9 @@ function atomicreplace_impl(success_order, fail_order, ex, old_new)
     fo = order_expr(fail_order)
     if isexpr(old_new, :call, 3) && old_new.args[1] === :(=>)
         exp, rep = esc(old_new.args[2]), esc(old_new.args[3])
-        cas = :(UnsafeAtomics.cas!($ref, $exp, $rep, $so, $fo))
+        return :(UnsafeAtomics.cas!($ref, $exp, $rep, $so, $fo))
     else
         old_new = esc(old_new)
-        cas = :(UnsafeAtomics.cas!($ref, $old_new::Pair..., $so, $fo))
+        return :(UnsafeAtomics.cas!($ref, $old_new::Pair..., $so, $fo))
     end
-    return :(NamedTuple{(:old, :success)}($cas))
 end
