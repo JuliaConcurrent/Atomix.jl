@@ -1,10 +1,10 @@
-name = "AtomicArraysCUDATests"
-uuid = "9d3216a9-af1a-4f5a-aafd-8b8ccf229362"
+name = "AtomixCUDATests"
+uuid = "210b840b-8615-4854-b591-ce0d4815b014"
 authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
 version = "0.1.0-DEV"
 
 [deps]
-AtomicArraysCUDA = "004af32d-454c-4810-8025-cf61a147993c"
+AtomixCUDA = "6171a885-8764-404f-b64d-f8edb1679b6f"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 

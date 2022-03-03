@@ -1,11 +1,11 @@
 module TestDoctest
 
-import AtomicArrays
+import Atomix
 using Documenter: doctest
 using Test
 
 function test_doctest()
-    doctest(AtomicArrays; manual = false)
+    doctest(Atomix; manual = false)
 end
 
 end  # module

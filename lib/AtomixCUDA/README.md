@@ -1,1 +1,1 @@
-# AtomicArraysCUDA
+# AtomixCUDA

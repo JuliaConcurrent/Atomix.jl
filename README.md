@@ -1,12 +1,12 @@
-# AtomicArrays
+# Atomix
 
-AtomicArrays.jl implements `@atomic`, `@atomicswap`, and `@atomicreplace` that
+Atomix.jl implements `@atomic`, `@atomicswap`, and `@atomicreplace` that
 are superset of the macros in `Base`.  In addition to atomic operations on the
 fields as implemented in `Base`, they support atomic operations on array
 elements.
 
 ```julia
-julia> using AtomicArrays: @atomic, @atomicswap, @atomicreplace
+julia> using Atomix: @atomic, @atomicswap, @atomicreplace
 
 julia> A = ones(Int, 3);
 

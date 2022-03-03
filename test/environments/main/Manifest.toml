@@ -11,16 +11,16 @@ uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 [[Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 
-[[AtomicArrays]]
+[[Atomix]]
 deps = ["UnsafeAtomics"]
 path = "../../.."
-uuid = "e7abd3ad-702b-465e-9b9c-82c2920774a1"
+uuid = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 version = "0.1.0-DEV"
 
-[[AtomicArraysTests]]
-deps = ["AtomicArrays", "Documenter", "Test", "UnsafeAtomics"]
-path = "../../AtomicArraysTests"
-uuid = "f1956f8a-55c3-4b2d-8154-1c150ba49d31"
+[[AtomixTests]]
+deps = ["Atomix", "Documenter", "Test", "UnsafeAtomics"]
+path = "../../AtomixTests"
+uuid = "6f95a7dd-85ce-4dbe-a121-27757241c193"
 version = "0.1.0-DEV"
 
 [[Base64]]
