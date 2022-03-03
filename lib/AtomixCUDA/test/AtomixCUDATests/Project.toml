@@ -4,9 +4,11 @@ authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
 version = "0.1.0-DEV"
 
 [deps]
+Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 AtomixCUDA = "6171a885-8764-404f-b64d-f8edb1679b6f"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"
 
 [compat]
 julia = "1.6"
