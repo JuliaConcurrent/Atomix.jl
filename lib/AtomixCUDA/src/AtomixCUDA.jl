@@ -1,43 +1,38 @@
 # TODO: respect ordering
 module AtomixCUDA
 
-using Atomix: AtomicRef
-using CUDA: CUDA, CuArray, CuDeviceArray
-using UnsafeAtomics: UnsafeAtomics, Ordering
+using Atomix
+using CUDA: CUDA, CuDeviceArray
 
-const GenericCuArray{T,N} = Union{CuArray{T,N},CuDeviceArray{T,N}}
-const CuAtomicRef{T,Ptr,Data<:GenericCuArray} = AtomicRef{T,Ptr,Data}
-
-function UnsafeAtomics.load(ref::CuAtomicRef{T}, ord::Ordering) where {T}
+function Atomix.get(m::CuDeviceArray{T}, lens, order) where {T}
     error("not implemented")
 end
 
-function UnsafeAtomics.store!(ref::CuAtomicRef{T}, v, ord::Ordering) where {T}
+function Atomix.set!(m::CuDeviceArray{T}, lens, v, order) where {T}
     error("not implemented")
 end
 
-@inline function UnsafeAtomics.cas!(
-    ref::CuAtomicRef{T},
+@inline function Atomix.replace!(
+    m::CuDeviceArray{T},
+    lens,
     expected,
     desired,
-    success_ordering::Ordering,
-    failure_ordering::Ordering,
+    success_ordering,
+    failure_ordering,
 ) where {T}
-    ptr = ref.ptr
+    ptr = Atomix.pointer(m, lens)
     expected = convert(T, expected)
     desired = convert(T, desired)
-    data = ref.data
-    GC.@preserve data begin
+    begin
         old = CUDA.atomic_cas!(ptr, expected, desired)
     end
     return (; old = old, success = old === expected)
 end
 
-@inline function UnsafeAtomics.modify!(ref::CuAtomicRef{T}, op::OP, x, ord) where {T,OP}
+@inline function Atomix.modify!(m::CuDeviceArray{T}, lens, op::OP, x, order) where {T,OP}
     x = convert(T, x)
-    ptr = ref.ptr
-    data = ref.data
-    GC.@preserve data begin
+    ptr = Atomix.pointer(m, lens)
+    begin
         old = if op === (+)
             CUDA.atomic_add!(ptr, x)
         elseif op === (-)

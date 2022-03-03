@@ -6,7 +6,6 @@ version = "0.1.0-DEV"
 [deps]
 Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
-UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"
 
 [compat]
 julia = "1.6"
