@@ -1,7 +1,7 @@
 # TODO: respect ordering
-module AtomicArraysCUDA
+module AtomixCUDA
 
-using AtomicArrays: AtomicRef
+using Atomix: AtomicRef
 using CUDA: CUDA, CuArray, CuDeviceArray
 using UnsafeAtomics: UnsafeAtomics, Ordering
 
@@ -59,4 +59,4 @@ end
     return (old, op(old, x))
 end
 
-end  # module AtomicArraysCUDA
+end  # module AtomixCUDA

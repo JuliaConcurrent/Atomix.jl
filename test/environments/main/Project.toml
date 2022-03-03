@@ -1,6 +1,6 @@
 [deps]
-AtomicArrays = "e7abd3ad-702b-465e-9b9c-82c2920774a1"
-AtomicArraysTests = "f1956f8a-55c3-4b2d-8154-1c150ba49d31"
+Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
+AtomixTests = "6f95a7dd-85ce-4dbe-a121-27757241c193"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 TestFunctionRunner = "792026f5-ac9a-4a19-adcb-47b0ce2deb5d"
 UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"

@@ -1,5 +1,5 @@
 """
-    AtomicArrays.@atomic
+    Atomix.@atomic
 
 A superset of `Base.@atomic` supporting atomic operations on array elements.
 Atomic operations on fields dispatches to `Base.@atomic`.
@@ -79,7 +79,7 @@ function atomic_impl(order, a1, op, a2)
 end
 
 """
-    AtomicArrays.@atomicswap
+    Atomix.@atomicswap
 
 A superset of `Base.@atomicswap` supporting atomic operations on array elements.
 Atomic operations on fields dispatches to `Base.@atomicswap`.
@@ -110,7 +110,7 @@ function atomicswap_impl(order, ex)
 end
 
 """
-    AtomicArrays.@atomicreplace
+    Atomix.@atomicreplace
 
 A superset of `Base.@atomicreplace` supporting atomic operations on array
 elements.  Atomic operations on fields dispatches to `Base.@atomicreplace`.

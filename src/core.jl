@@ -68,7 +68,7 @@ end
 end
 =#
 
-@inline AtomicArrays.asref(A) = AtomicRefArray(A)
+@inline Atomix.asref(A) = AtomicRefArray(A)
 
 Base.size(A::AtomicRefArray) = size(A.data)
 Base.IndexStyle(::Type{<:AtomicRefArray{<:Any,<:Any,Data}}) where {Data} = Base.IndexStyle(Data)

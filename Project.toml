@@ -1,5 +1,5 @@
-name = "AtomicArrays"
-uuid = "e7abd3ad-702b-465e-9b9c-82c2920774a1"
+name = "Atomix"
+uuid = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
 version = "0.1.0-DEV"
 

@@ -1,8 +1,8 @@
 module TestSugar
 
-import AtomicArraysCUDA
+import AtomixCUDA
 
-using AtomicArrays: @atomic
+using Atomix: @atomic
 using CUDA
 using CUDA: @allowscalar
 using Test

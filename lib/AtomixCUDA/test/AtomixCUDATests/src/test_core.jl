@@ -1,8 +1,8 @@
 module TestCore
 
-import AtomicArraysCUDA
+import AtomixCUDA
 
-using AtomicArrays: asref
+using Atomix: asref
 using CUDA
 using CUDA: @allowscalar
 using Test

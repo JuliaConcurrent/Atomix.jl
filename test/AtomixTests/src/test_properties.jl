@@ -1,6 +1,6 @@
 module TestProperties
 
-using AtomicArrays: AtomicRefArray
+using Atomix: AtomicRefArray
 using Test
 
 function test()

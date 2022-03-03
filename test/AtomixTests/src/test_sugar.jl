@@ -1,6 +1,6 @@
 module TestSugar
 
-using AtomicArrays: @atomic, @atomicreplace, @atomicswap
+using Atomix: @atomic, @atomicreplace, @atomicswap
 using Test
 
 function test_get()

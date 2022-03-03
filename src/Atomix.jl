@@ -1,4 +1,4 @@
-baremodule AtomicArrays
+baremodule Atomix
 
 export AtomicRefArray
 
@@ -23,8 +23,8 @@ function asref end
 
 module Internal
 
-import ..AtomicArrays: AtomicRef, AtomicRefArray, @atomic, @atomicswap, @atomicreplace
-using ..AtomicArrays: AtomicArrays, asref
+import ..Atomix: AtomicRef, AtomicRefArray, @atomic, @atomicswap, @atomicreplace
+using ..Atomix: Atomix, asref
 
 using Base.Meta: isexpr
 using Base: @propagate_inbounds
@@ -45,14 +45,14 @@ function define_docstring()
     doc = replace(doc, r"^```julia"m => "```jldoctest README")
     # Setting `LineNumberNode` to workaround an error from logging(?) `no method
     # matching getindex(::Nothing, ::Int64)`:
-    ex = :($Base.@doc $doc AtomicArrays)
+    ex = :($Base.@doc $doc Atomix)
     ex.args[2]::LineNumberNode
     ex.args[2] = LineNumberNode(1, Symbol(path))
-    Base.eval(AtomicArrays, ex)
+    Base.eval(Atomix, ex)
 end
 
 end  # module Internal
 
 Internal.define_docstring()
 
-end  # baremodule AtomicArrays
+end  # baremodule Atomix

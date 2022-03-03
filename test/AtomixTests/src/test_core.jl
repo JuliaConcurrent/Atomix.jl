@@ -1,6 +1,6 @@
 module TestCore
 
-using AtomicArrays: AtomicRefArray
+using Atomix: AtomicRefArray
 using Test
 using UnsafeAtomics: UnsafeAtomics
 
