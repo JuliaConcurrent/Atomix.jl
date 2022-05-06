@@ -15,9 +15,9 @@ function test_get_set()
     A = CUDA.ones(Int, 3)
     cuda() do
         GC.@preserve A begin
-            lens = Atomix.IndexLens((1,))
-            x = Atomix.get(A, lens)
-            Atomix.set!(A, lens, -x)
+            ref = Atomix.IndexableRef(A, (1,))
+            x = Atomix.get(ref)
+            Atomix.set!(ref, -x)
         end
     end
     @test collect(A) == [-1, 1, 1]
@@ -37,10 +37,10 @@ function test_cas()
     A = CUDA.zeros(Int, length(idx))
     cuda() do
         GC.@preserve A begin
-            lens = Atomix.IndexLens((1,))
-            (old, success) = Atomix.replace!(A, lens, 0, 42)
+            ref = Atomix.IndexableRef(A, (1,))
+            (old, success) = Atomix.replace!(ref, 0, 42)
             A[idx.cas1_ok] = old == 0 && success
-            (old, success) = Atomix.replace!(A, lens, 0, 43)
+            (old, success) = Atomix.replace!(ref, 0, 43)
             A[idx.cas2_ok] = old == 42 && !success
         end
     end
@@ -51,8 +51,8 @@ function test_inc()
     A = CUDA.CuVector(1:3)
     cuda() do
         GC.@preserve A begin
-            lens = Atomix.IndexLens((1,))
-            pre, post = Atomix.modify!(A, lens, +, 1)
+            ref = Atomix.IndexableRef(A, (1,))
+            pre, post = Atomix.modify!(ref, +, 1)
             A[2] = pre
             A[3] = post
         end

@@ -4,20 +4,18 @@ macro atomic end
 macro atomicreplace end
 macro atomicswap end
 
-# TODO: Use Accessors.jl? (if `Accessors.IndexLens` can be made public)
-struct IndexLens{I<:Tuple}
-    indices::I
+struct IndexableRef{Indexable,Indices}
+    data::Indexable
+    indices::Indices
 end
-
-#=
-struct PropertyLens{fieldname} end
-=#
 
 function asstorable end
 
 # Maybe it's useful to make `pointer` customizable for those who want to
 # dispatch at the level of UnsafeAtomics?
 function pointer end
+
+function gcroot end
 
 function get end
 function set! end
@@ -27,7 +25,7 @@ function replace! end
 
 module Internal
 
-import ..Atomix: @atomic, @atomicswap, @atomicreplace
+import ..Atomix: @atomic, @atomicswap, @atomicreplace, IndexableRef
 using ..Atomix
 
 using Base.Meta: isexpr
