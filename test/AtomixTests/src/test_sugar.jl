@@ -9,6 +9,17 @@ function test_get()
     @test (@atomic A[end]) === 42
 end
 
+function test_get_2d()
+    A = view([11 12; 21 22], 1:2, 1:2)
+    @test IndexStyle(A) isa IndexCartesian
+    @test (@atomic A[1]) === 11
+    @test (@atomic A[2]) === 21
+    @test (@atomic A[end]) === 22
+    @test (@atomic A[2, 1]) === 21
+    @test (@atomic A[end, 1]) === 21
+    @test (@atomic A[1, end]) === 12
+end
+
 function test_set()
     A = [42, 43]
     @atomic A[1] = 123

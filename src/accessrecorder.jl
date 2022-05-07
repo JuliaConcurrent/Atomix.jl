@@ -19,7 +19,7 @@ const IntIndexLens{N} = Atomix.IndexLens{NTuple{N,Int}}
 #       where `xs::LensArray{2}` returns a different value.
 # TODO: only store `axes(data)`?
 struct LensArray{N,Data<:AbstractArray{<:Any,N}} <:
-       AbstractArray{N,Union{IntIndexLens{N},IntIndexLens{1}}}
+       AbstractArray{Union{IntIndexLens{N},IntIndexLens{1}},N}
     data::Data
 end
 
@@ -31,7 +31,7 @@ Base.IndexStyle(::Type{<:LensArray{<:Any,Data}}) where {Data} = Base.IndexStyle(
     return IntIndexLens{1}((i,))
 end
 
-@propagate_inbounds function Base.setindex(a::LensArray{N}, I::Vararg{Int,N}) where {N}
+@propagate_inbounds function Base.getindex(a::LensArray{N}, I::Vararg{Int,N}) where {N}
     @boundscheck checkbounds(a.data, I...)
     return IntIndexLens{N}(I)
 end
@@ -39,7 +39,7 @@ end
 @inline Atomix.pointer(a::AbstractArray, lens::IntIndexLens{1}) =
     pointer(a, lens.indices[1])
 
-@inline function Atomix.pointer(a::AbstractArray{N}, lens::IntIndexLens{N}) where {N}
-    i = LinearIndices(data)[lens.indices...]
+@inline function Atomix.pointer(a::AbstractArray{<:Any,N}, lens::IntIndexLens{N}) where {N}
+    i = LinearIndices(a)[lens.indices...]
     return pointer(a, i)
 end
