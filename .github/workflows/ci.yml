@@ -45,6 +45,7 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
+      - uses: tkf/julia-aqua@v1
 
   # https://github.com/tkf/julia-code-style-suggesters
   code-style:

@@ -7,4 +7,5 @@ version = "0.1.0-DEV"
 UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"
 
 [compat]
+UnsafeAtomics = "0.1"
 julia = "1.6"
