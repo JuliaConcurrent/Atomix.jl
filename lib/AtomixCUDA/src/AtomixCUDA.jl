@@ -52,7 +52,7 @@ end
             error("not implemented")
         end
     end
-    return (old, op(old, x))
+    return old => op(old, x)
 end
 
 end  # module AtomixCUDA
