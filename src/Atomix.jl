@@ -4,10 +4,7 @@ macro atomic end
 macro atomicreplace end
 macro atomicswap end
 
-struct IndexableRef{Indexable,Indices}
-    data::Indexable
-    indices::Indices
-end
+abstract type IndexableRef{Indexable} end
 
 function asstorable end
 
@@ -25,7 +22,7 @@ function replace! end
 
 module Internal
 
-import ..Atomix: @atomic, @atomicswap, @atomicreplace, IndexableRef
+import ..Atomix: @atomic, @atomicswap, @atomicreplace
 using ..Atomix
 
 using Base.Meta: isexpr
@@ -56,6 +53,7 @@ end  # module Internal
 
 const Ordering = Internal.Ordering
 
+const monotonic = Internal.monotonic
 const acquire = Internal.acquire
 const release = Internal.release
 const acq_rel = Internal.acq_rel
