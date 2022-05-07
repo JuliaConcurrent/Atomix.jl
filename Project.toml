@@ -1,7 +1,7 @@
 name = "Atomix"
 uuid = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
-version = "0.1.0-DEV"
+version = "0.1.0"
 
 [deps]
 UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"
