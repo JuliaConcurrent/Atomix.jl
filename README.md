@@ -1,5 +1,8 @@
 # Atomix
 
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliaconcurrent.github.io/Atomix.jl/dev/)
+[![CI](https://github.com/JuliaConcurrent/Atomix.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/JuliaConcurrent/Atomix.jl/actions/workflows/ci.yml)
+
 Atomix.jl implements `@atomic`, `@atomicswap`, and `@atomicreplace` that
 are superset of the macros in `Base`.  In addition to atomic operations on the
 fields as implemented in `Base`, they support atomic operations on array
