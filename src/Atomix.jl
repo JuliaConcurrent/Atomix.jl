@@ -34,7 +34,7 @@ using UnsafeAtomics:
     Ordering, UnsafeAtomics, monotonic, acquire, release, acq_rel, seq_cst, right
 
 include("utils.jl")
-include("accessrecorder.jl")
+include("references.jl")
 include("generic.jl")
 include("core.jl")
 include("sugar.jl")
