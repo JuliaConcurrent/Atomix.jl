@@ -30,13 +30,12 @@ macro atomic(order, a1, op, a2)
     esc(:($Base.@atomic($order, $a1, $op, $a2)))
 end
 
-function object_and_lens_expr(ex)
+function ref_expr(ex)
     @nospecialize
     isexpr(ex, :ref) || return nothing
     m = esc(ex.args[1])
     indices = map(esc, ex.args[2:end])
-    lens = :(accessrecorder($m)[$(indices...)])
-    return (m, lens)
+    return :(accessrecorder($m)[$(indices...)])
 end
 
 function order_expr(order)
@@ -51,16 +50,14 @@ end
 function atomic_impl(order, ex)
     @nospecialize
     if ex isa Expr
-        if (y = object_and_lens_expr(ex)) !== nothing
-            m, lens = y
-            return :(Atomix.get($m, $lens, $(order_expr(order))))
+        if (ref = ref_expr(ex)) !== nothing
+            return :(Atomix.get($ref, $(order_expr(order))))
         elseif isexpr(ex, :call, 3)
             return atomic_impl(order, ex.args[2], ex.args[1], ex.args[3])
         elseif ex.head === :(=)
             l, r = ex.args[1], esc(ex.args[2])
-            if (y = object_and_lens_expr(l)) !== nothing
-                m, lens = y
-                return :(Atomix.set!($m, $lens, $r, $(order_expr(order))))
+            if (ref = ref_expr(l)) !== nothing
+                return :(Atomix.set!($ref, $r, $(order_expr(order))))
             end
         elseif length(ex.args) == 2
             shead = string(ex.head)
@@ -76,10 +73,9 @@ end
 
 function atomic_impl(order, a1, op, a2)
     @nospecialize
-    y = object_and_lens_expr(a1)
-    y === nothing && return nothing
-    m, lens = y
-    :(Atomix.modify!($m, $lens, $(esc(op)), $(esc(a2)), $(order_expr(order))))
+    ref = ref_expr(a1)
+    ref === nothing && return nothing
+    :(Atomix.modify!($ref, $(esc(op)), $(esc(a2)), $(order_expr(order))))
 end
 
 """
@@ -105,11 +101,10 @@ end
 function atomicswap_impl(order, ex)
     @nospecialize
     isexpr(ex, :(=), 2) || return nothing
-    y = object_and_lens_expr(ex.args[1])
-    y === nothing && return nothing
-    m, lens = y
+    ref = ref_expr(ex.args[1])
+    ref === nothing && return nothing
     val = esc(ex.args[2])
-    return :(first(Atomix.modify!($m, $lens, right, $val, $(order_expr(order)))))
+    return :(first(Atomix.modify!($ref, right, $val, $(order_expr(order)))))
 end
 
 """
@@ -141,16 +136,15 @@ end
 
 function atomicreplace_impl(success_order, fail_order, ex, old_new)
     @nospecialize
-    y = object_and_lens_expr(ex)
-    y === nothing && return nothing
-    m, lens = y
+    ref = ref_expr(ex)
+    ref === nothing && return nothing
     so = order_expr(success_order)
     fo = order_expr(fail_order)
     if isexpr(old_new, :call, 3) && old_new.args[1] === :(=>)
         exp, rep = esc(old_new.args[2]), esc(old_new.args[3])
-        return :(Atomix.replace!($m, $lens, $exp, $rep, $so, $fo))
+        return :(Atomix.replace!($ref, $exp, $rep, $so, $fo))
     else
         old_new = esc(old_new)
-        return :(Atomix.replace!($m, $lens, $old_new::Pair..., $so, $fo))
+        return :(Atomix.replace!($ref, $old_new::Pair..., $so, $fo))
     end
 end

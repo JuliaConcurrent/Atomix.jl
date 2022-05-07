@@ -1,37 +1,38 @@
 # TODO: respect ordering
 module AtomixCUDA
 
-using Atomix
+using Atomix: Atomix, IndexableRef
 using CUDA: CUDA, CuDeviceArray
 
-function Atomix.get(m::CuDeviceArray{T}, lens, order) where {T}
+const CuIndexableRef{Indexable<:CuDeviceArray} = IndexableRef{Indexable}
+
+function Atomix.get(ref::CuIndexableRef, order)
     error("not implemented")
 end
 
-function Atomix.set!(m::CuDeviceArray{T}, lens, v, order) where {T}
+function Atomix.set!(ref::CuIndexableRef, v, order)
     error("not implemented")
 end
 
 @inline function Atomix.replace!(
-    m::CuDeviceArray{T},
-    lens,
+    ref::CuIndexableRef,
     expected,
     desired,
     success_ordering,
     failure_ordering,
-) where {T}
-    ptr = Atomix.pointer(m, lens)
-    expected = convert(T, expected)
-    desired = convert(T, desired)
+)
+    ptr = Atomix.pointer(ref)
+    expected = convert(eltype(ref), expected)
+    desired = convert(eltype(ref), desired)
     begin
         old = CUDA.atomic_cas!(ptr, expected, desired)
     end
     return (; old = old, success = old === expected)
 end
 
-@inline function Atomix.modify!(m::CuDeviceArray{T}, lens, op::OP, x, order) where {T,OP}
-    x = convert(T, x)
-    ptr = Atomix.pointer(m, lens)
+@inline function Atomix.modify!(ref::CuIndexableRef, op::OP, x, order) where {OP}
+    x = convert(eltype(ref), x)
+    ptr = Atomix.pointer(ref)
     begin
         old = if op === (+)
             CUDA.atomic_add!(ptr, x)
