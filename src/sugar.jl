@@ -35,7 +35,7 @@ function ref_expr(ex)
     isexpr(ex, :ref) || return nothing
     m = esc(ex.args[1])
     indices = map(esc, ex.args[2:end])
-    return :(accessrecorder($m)[$(indices...)])
+    return :(referenceable($m)[$(indices...)])
 end
 
 function order_expr(order)
