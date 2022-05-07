@@ -13,7 +13,7 @@ function accessrecorder end
 
 accessrecorder(xs::AbstractArray) = ReferenceableArray(xs)
 
-Base.eltype(::Type{IndexableRef{Indexable,<:Any}}) where {Indexable} = eltype(Indexable)
+Base.eltype(::Type{<:IndexableRef{Indexable,<:Any}}) where {Indexable} = eltype(Indexable)
 
 const IntIndexableRef{N,Indexable} = IndexableRef{Indexable,NTuple{N,Int}}
 
