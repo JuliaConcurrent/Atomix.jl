@@ -7,6 +7,9 @@ function test_get()
     A = [42]
     @test (@atomic A[1]) === 42
     @test (@atomic A[end]) === 42
+    @test (@atomic :monotonic A[begin]) === 42
+    order = :monotonic
+    @test (@atomic order A[begin]) === 42
 end
 
 function test_get_2d()
@@ -52,6 +55,9 @@ function test_cas()
     @test A[1] === 123
     @test (@atomicreplace A[end] 1 => 789) == (old = 1, success = true)
     @test A[end] === 789
+    update = 789 => 123
+    @test (@atomicreplace A[end] update) == (old = 789, success = true)
+    @test A[end] === 123
 end
 
 end  # module
