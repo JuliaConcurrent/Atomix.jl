@@ -6,6 +6,18 @@
 
 Atomically load the value `x` stored in `ref` with ordering `order`.  The default ordering
 `Atomix.sequentially_consistent` is used when not specified.
+
+# Examples
+```jldoctest
+julia> using Atomix
+
+julia> a = [111, 222, 333];
+
+julia> ref = Atomix.IndexableRef(a, (1,));
+
+julia> Atomix.get(ref)
+111
+```
 """
 Atomix.get
 
@@ -15,6 +27,20 @@ Atomix.get
 
 Atomically store the value `x` in `ref` with ordering `order`.  The default ordering
 `Atomix.sequentially_consistent` is used when not specified.
+
+# Examples
+```jldoctest
+julia> using Atomix
+
+julia> a = [111, 222, 333];
+
+julia> ref = Atomix.IndexableRef(a, (1,));
+
+julia> Atomix.set!(ref, 123);
+
+julia> a[1]
+123
+```
 """
 Atomix.set!
 
@@ -24,6 +50,18 @@ Atomix.set!
 
 Atomically update `ref` from stored value `old` to `new = op(old, x)` with ordering `order`
 (default: `Atomix.sequentially_consistent`).  Return a pair `old => new`.
+
+# Examples
+```jldoctest
+julia> using Atomix
+
+julia> a = [111, 222, 333];
+
+julia> ref = Atomix.IndexableRef(a, (1,));
+
+julia> Atomix.modify!(ref, +, 123)
+111 => 234
+```
 """
 Atomix.modify!
 
@@ -31,11 +69,26 @@ Atomix.modify!
     Atomix.swap!(ref, new, order) -> old
     Atomix.swap!(ref, new) -> old
 
-Swap the `new` value with the `old` stored in `ref` with ordering `order` (default:
-`Atomix.sequentially_consistent`).
+Swap the `old` stored in `ref` with the `new` value and establish the memory ordering
+`order` (default: `Atomix.sequentially_consistent`).
 
 Notes for implementers: `Atomix.swap!(ref, new, order)` is defined as `Atomix.modify!(ref,
 Atomix.right, x, order)`.  Thus, only `Atomix.modify!` has to be defined.
+
+# Examples
+```jldoctest
+julia> using Atomix
+
+julia> a = [111, 222, 333];
+
+julia> ref = Atomix.IndexableRef(a, (1,));
+
+julia> Atomix.swap!(ref, 123)
+111
+
+julia> a[1]
+123
+```
 """
 Atomix.swap!
 
@@ -46,6 +99,18 @@ Atomix.swap!
 
 Atomically replace the value stored in `ref` to `desired` if `expected` is stored.  A named
 tuple `(; old::eltype(ref), success::Bool)` is returned.
+
+# Examples
+```jldoctest
+julia> using Atomix
+
+julia> a = [111, 222, 333];
+
+julia> ref = Atomix.IndexableRef(a, (1,));
+
+julia> Atomix.replace!(ref, 111, 123)
+(old = 111, success = true)
+```
 """
 Atomix.replace!
 
