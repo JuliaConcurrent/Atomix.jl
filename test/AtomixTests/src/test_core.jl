@@ -1,7 +1,7 @@
 module TestCore
 
 using Atomix
-using Atomix.Internal: accessrecorder
+using Atomix.Internal: referenceable
 using Test
 
 function test_indexableref()
@@ -26,7 +26,7 @@ function test_referenceablearray()
         view(ones(Int, 2, 3), 1:1, 1:2),
         ones(Int, 3)',
     ]
-        ra = accessrecorder(a)
+        ra = referenceable(a)
         @test size(ra) == size(a)
         @test IndexStyle(ra) == IndexStyle(a)
     end

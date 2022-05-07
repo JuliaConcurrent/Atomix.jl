@@ -1,5 +1,5 @@
 """
-    accessrecorder(mutable) -> recorder
+    referenceable(mutable) -> recorder
 
 Return a `recorder` such that index and field access yield a ref to the corresponding memory
 location.
@@ -9,9 +9,9 @@ TODO: record field access
 TODO: record nested field and index access to update nested element (e.g.,
 array-of-large-structs) atomically?
 """
-function accessrecorder end
+function referenceable end
 
-accessrecorder(xs::AbstractArray) = ReferenceableArray(xs)
+referenceable(xs::AbstractArray) = ReferenceableArray(xs)
 
 Base.eltype(::Type{<:IndexableRef{Indexable,<:Any}}) where {Indexable} = eltype(Indexable)
 
