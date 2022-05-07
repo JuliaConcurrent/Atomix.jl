@@ -119,19 +119,19 @@ macro atomicreplace(ex, old_new)
     order = QuoteNode(:sequentially_consistent)
     ans = atomicreplace_impl(order, order, ex, old_new)
     ans === nothing || return ans
-    esc(:($Base.@atomicreplace($ex, old_new)))
+    esc(:($Base.@atomicreplace($ex, $old_new)))
 end
 
 macro atomicreplace(order, ex, old_new)
     ans = atomicreplace_impl(order, order, ex, old_new)
     ans === nothing || return ans
-    esc(:($Base.@atomicreplace($order, $ex, old_new)))
+    esc(:($Base.@atomicreplace($order, $ex, $old_new)))
 end
 
 macro atomicreplace(success_order, fail_order, ex, old_new)
     ans = atomicreplace_impl(success_order, fail_order, ex, old_new)
     ans === nothing || return ans
-    esc(:($Base.@atomicreplace($success_order, $fail_order, $ex, old_new)))
+    esc(:($Base.@atomicreplace($success_order, $fail_order, $ex, $old_new)))
 end
 
 function atomicreplace_impl(success_order, fail_order, ex, old_new)
