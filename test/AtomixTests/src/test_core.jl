@@ -11,7 +11,7 @@ function test_indexableref()
     @test Atomix.get(ref) === 1
     Atomix.set!(ref, 123)
     @test Atomix.get(ref) === 123
-    @test Atomix.modify!(ref, +, 1) === (123, 124)
+    @test Atomix.modify!(ref, +, 1) === (123 => 124)
     @test Atomix.get(ref) === 124
     @test Atomix.swap!(ref, 345) == 124
     @test Atomix.get(ref) === 345
