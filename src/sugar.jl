@@ -104,7 +104,7 @@ function atomicswap_impl(order, ex)
     ref = ref_expr(ex.args[1])
     ref === nothing && return nothing
     val = esc(ex.args[2])
-    return :(first(Atomix.modify!($ref, right, $val, $(order_expr(order)))))
+    return :(first(Atomix.swap!($ref, $val, $(order_expr(order)))))
 end
 
 """
