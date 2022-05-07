@@ -1,30 +1,34 @@
 baremodule Atomix
 
-export AtomicRefArray
-
-import Base
-
 macro atomic end
 macro atomicreplace end
 macro atomicswap end
 
-struct AtomicRef{T,Ptr,Data}
-    eltype::Base.Val{T}
-    ptr::Ptr
-    data::Data
+# TODO: Use Accessors.jl? (if `Accessors.IndexLens` can be made public)
+struct IndexLens{I<:Tuple}
+    indices::I
 end
 
-struct AtomicRefArray{T,N,Data<:Base.AbstractArray{T,N}} <:
-       Base.AbstractArray{AtomicRef{T,Data},N}
-    data::Data
-end
+#=
+struct PropertyLens{fieldname} end
+=#
 
-function asref end
+function asstorable end
+
+# Maybe it's useful to make `pointer` customizable for those who want to
+# dispatch at the level of UnsafeAtomics?
+function pointer end
+
+function get end
+function set! end
+function modify! end
+function swap! end
+function replace! end
 
 module Internal
 
-import ..Atomix: AtomicRef, AtomicRefArray, @atomic, @atomicswap, @atomicreplace
-using ..Atomix: Atomix, asref
+import ..Atomix: @atomic, @atomicswap, @atomicreplace
+using ..Atomix
 
 using Base.Meta: isexpr
 using Base: @propagate_inbounds
@@ -32,11 +36,10 @@ using UnsafeAtomics:
     Ordering, UnsafeAtomics, monotonic, acquire, release, acq_rel, seq_cst, right
 
 include("utils.jl")
+include("accessrecorder.jl")
+include("generic.jl")
 include("core.jl")
 include("sugar.jl")
-if isdefined(Base, :replaceproperty!)  # 1.7 or later
-    include("properties.jl")
-end
 
 function define_docstring()
     path = joinpath(@__DIR__, "..", "README.md")
@@ -52,6 +55,19 @@ function define_docstring()
 end
 
 end  # module Internal
+
+const Ordering = Internal.Ordering
+
+const acquire = Internal.acquire
+const release = Internal.release
+const acq_rel = Internal.acq_rel
+const seq_cst = Internal.seq_cst
+
+# Julia names
+const acquire_release = acq_rel
+const sequentially_consistent = seq_cst
+
+const right = Internal.UnsafeAtomics.right
 
 Internal.define_docstring()
 
