@@ -9,4 +9,4 @@
     Atomix.replace!(ref, expected, desired, order, order)
 
 @inline Atomix.swap!(ref, x, order::Ordering = seq_cst) =
-    first(Atomix.modify!(ref, op, x, order))
+    first(Atomix.modify!(ref, right, x, order))
