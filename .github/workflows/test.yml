@@ -13,7 +13,8 @@ jobs:
     strategy:
       matrix:
         julia-version:
-          - '~1.7.0-beta4'
+          - '1'
+          - '1.6'
           - 'nightly'
       fail-fast: false
     name: Test Julia ${{ matrix.julia-version }}
@@ -29,3 +30,14 @@ jobs:
           file: ./lcov.info
           flags: Pkg.test
           name: codecov-umbrella
+
+  # A job that succeeds if and only if all jobs succeed.
+  all-success:
+    if: always() && github.event.pull_request
+    needs: [test, aqua, code-style]
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/tkf/merge-conclusions-action
+      - uses: tkf/merge-conclusions-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
