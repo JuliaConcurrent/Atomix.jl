@@ -15,7 +15,6 @@ jobs:
         julia-version:
           - '1'
           - '1.6'
-          - 'nightly'
       fail-fast: false
     name: Test Julia ${{ matrix.julia-version }}
     steps:
@@ -38,7 +37,6 @@ jobs:
         julia-version:
           - '1'
           - '1.6'
-          - 'nightly'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
