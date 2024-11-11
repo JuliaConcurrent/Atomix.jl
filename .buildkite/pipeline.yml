@@ -7,7 +7,7 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
-                Pkg.activate("lib/AtomixCUDA")
+                Pkg.add("CUDA")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
@@ -26,7 +26,7 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
-                Pkg.activate("lib/AtomixMetal")
+                Pkg.add("Metal")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
