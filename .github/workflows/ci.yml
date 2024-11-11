@@ -34,25 +34,6 @@ jobs:
           flags: Pkg.test
           name: codecov-umbrella
 
-  aqua:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        julia-version:
-          - '1'
-          - 'lts'
-          - 'pre'
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: julia-actions/setup-julia@v2
-        with:
-          version: ${{ matrix.julia-version }}
-      - uses: julia-actions/cache@v2
-
-      - uses: tkf/julia-aqua@v1
-
   documenter:
     runs-on: ubuntu-latest
     steps:
@@ -83,7 +64,7 @@ jobs:
   # A job that succeeds if and only if all jobs succeed.
   all-success:
     if: always() && github.event.pull_request
-    needs: [test, aqua, documenter]
+    needs: [test, documenter]
     runs-on: ubuntu-latest
     steps:
       # https://github.com/tkf/merge-conclusions-action

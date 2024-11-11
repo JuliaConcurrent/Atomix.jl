@@ -4,6 +4,12 @@ using Atomix: @atomic, @atomicreplace, @atomicswap
 using Test
 
 
+@testset "Aqua.jl" begin
+    using Aqua
+    Aqua.test_all(Atomix)
+end
+
+
 @testset "test_indexableref" begin
     A = ones(Int, 3)
     ref = Atomix.IndexableRef(A, (1,))

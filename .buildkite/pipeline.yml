@@ -11,7 +11,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test(test_args=["--CUDA"])'
+                Pkg.test("Atomix", test_args=["--CUDA"])'
     agents:
       queue: "juliagpu"
       cuda: "*"
@@ -30,7 +30,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test(test_args=["--Metal"])'
+                Pkg.test("Atomix", test_args=["--Metal"])'
     agents:
       queue: "juliaecosystem"
       os: "macos"
@@ -50,7 +50,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test(test_args=["--oneAPI"])'
+                Pkg.test("Atomix", test_args=["--oneAPI"])'
     agents:
       queue: "juliagpu"
       intel: "*"
