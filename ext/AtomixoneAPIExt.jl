@@ -1,21 +1,21 @@
 # TODO: respect ordering
-module AtomixCUDA
+module AtomixoneAPIExt
 
 using Atomix: Atomix, IndexableRef
-using CUDA: CUDA, CuDeviceArray
+using oneAPI: oneAPI, oneDeviceArray
 
-const CuIndexableRef{Indexable<:CuDeviceArray} = IndexableRef{Indexable}
+const oneIndexableRef{Indexable<:oneDeviceArray} = IndexableRef{Indexable}
 
-function Atomix.get(ref::CuIndexableRef, order)
+function Atomix.get(ref::oneIndexableRef, order)
     error("not implemented")
 end
 
-function Atomix.set!(ref::CuIndexableRef, v, order)
+function Atomix.set!(ref::oneIndexableRef, v, order)
     error("not implemented")
 end
 
 @inline function Atomix.replace!(
-    ref::CuIndexableRef,
+    ref::oneIndexableRef,
     expected,
     desired,
     success_ordering,
@@ -25,29 +25,29 @@ end
     expected = convert(eltype(ref), expected)
     desired = convert(eltype(ref), desired)
     begin
-        old = CUDA.atomic_cas!(ptr, expected, desired)
+        old = oneAPI.atomic_cmpxchg!(ptr, expected, desired)
     end
     return (; old = old, success = old === expected)
 end
 
-@inline function Atomix.modify!(ref::CuIndexableRef, op::OP, x, order) where {OP}
+@inline function Atomix.modify!(ref::oneIndexableRef, op::OP, x, order) where {OP}
     x = convert(eltype(ref), x)
     ptr = Atomix.pointer(ref)
     begin
         old = if op === (+)
-            CUDA.atomic_add!(ptr, x)
+            oneAPI.atomic_add!(ptr, x)
         elseif op === (-)
-            CUDA.atomic_sub!(ptr, x)
+            oneAPI.atomic_sub!(ptr, x)
         elseif op === (&)
-            CUDA.atomic_and!(ptr, x)
+            oneAPI.atomic_and!(ptr, x)
         elseif op === (|)
-            CUDA.atomic_or!(ptr, x)
+            oneAPI.atomic_or!(ptr, x)
         elseif op === xor
-            CUDA.atomic_xor!(ptr, x)
+            oneAPI.atomic_xor!(ptr, x)
         elseif op === min
-            CUDA.atomic_min!(ptr, x)
+            oneAPI.atomic_min!(ptr, x)
         elseif op === max
-            CUDA.atomic_max!(ptr, x)
+            oneAPI.atomic_max!(ptr, x)
         else
             error("not implemented")
         end
@@ -55,4 +55,4 @@ end
     return old => op(old, x)
 end
 
-end  # module AtomixCUDA
+end  # module AtomixoneAPIExt

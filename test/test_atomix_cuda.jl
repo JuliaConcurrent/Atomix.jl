@@ -1,13 +1,20 @@
-module TestCore
-
-import AtomixCUDA
-
-using Atomix
 using CUDA
 using CUDA: @allowscalar
-using Test
 
-using ..Utils: cuda
+
+@testset "AtomixCUDAExt:extension_found" begin
+    @test !isnothing(Base.get_extension(Atomix, :AtomixCUDAExt))
+end
+
+
+function cuda(f)
+    function g()
+        f()
+        nothing
+    end
+    CUDA.@cuda g()
+end
+
 
 # Not implemented:
 #=
@@ -24,7 +31,8 @@ function test_get_set()
 end
 =#
 
-function test_cas()
+
+@testset "AtomixCUDAExt:test_cas" begin
     idx = (
         data = 1,
         cas1_ok = 2,
@@ -47,7 +55,8 @@ function test_cas()
     @test collect(A) == [42, 1, 1]
 end
 
-function test_inc()
+
+@testset "AtomixCUDAExt:test_inc" begin
     A = CUDA.CuVector(1:3)
     cuda() do
         GC.@preserve A begin
@@ -60,4 +69,13 @@ function test_inc()
     @test collect(A) == [2, 1, 2]
 end
 
-end  # module
+
+@testset "AtomixCUDAExt:test_inc_sugar" begin
+    A = CUDA.ones(Int, 3)
+    cuda() do
+        GC.@preserve A begin
+            @atomic A[begin] += 1
+        end
+    end
+    @test collect(A) == [2, 1, 1]
+end
