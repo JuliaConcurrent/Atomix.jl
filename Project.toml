@@ -11,14 +11,11 @@ CUDA = "5"
 Metal = "1"
 UnsafeAtomics = "0.1, 0.2"
 julia = "1.6"
-oneAPI = "1"
 
 [extensions]
 AtomixCUDAExt = "CUDA"
 AtomixMetalExt = "Metal"
-AtomixoneAPIExt = "oneAPI"
 
 [weakdeps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
-oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
