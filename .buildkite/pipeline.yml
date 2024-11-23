@@ -38,3 +38,21 @@ steps:
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
 
+  - label: "oneAPI.jl"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1.10"
+    command: |
+      julia -e 'using Pkg
+
+                println("--- :julia: Instantiating environment")
+                Pkg.add("oneAPI")
+                Pkg.develop(PackageSpec(name="Atomix", path="."))
+
+                println("+++ :julia: Running tests")
+                Pkg.test("Atomix", test_args=["--oneAPI"])'
+    agents:
+      queue: "juliagpu"
+      intel: "*"
+    if: build.message !~ /\[skip tests\]/
+    timeout_in_minutes: 15
