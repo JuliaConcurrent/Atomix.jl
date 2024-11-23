@@ -1,5 +1,5 @@
 # TODO: respect ordering
-module AtomixCUDA
+module AtomixCUDAExt
 
 using Atomix: Atomix, IndexableRef
 using CUDA: CUDA, CuDeviceArray
@@ -55,4 +55,4 @@ end
     return old => op(old, x)
 end
 
-end  # module AtomixCUDA
+end  # module AtomixCUDAExt

@@ -7,11 +7,11 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
-                Pkg.activate("lib/AtomixCUDA")
+                Pkg.add("CUDA")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test()'
+                Pkg.test("Atomix", test_args=["--CUDA"])'
     agents:
       queue: "juliagpu"
       cuda: "*"
@@ -26,14 +26,15 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
-                Pkg.activate("lib/AtomixMetal")
+                Pkg.add("Metal")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test()'
+                Pkg.test("Atomix", test_args=["--Metal"])'
     agents:
       queue: "juliaecosystem"
       os: "macos"
       arch: "aarch64"
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
+

@@ -1,5 +1,5 @@
 # TODO: respect ordering
-module AtomixMetal
+module AtomixMetalExt
 
 using Atomix: Atomix, IndexableRef
 using Metal: Metal, MtlDeviceArray
@@ -55,4 +55,4 @@ end
     return old => op(old, x)
 end
 
-end  # module AtomixMetal
+end  # module AtomixMetalExt

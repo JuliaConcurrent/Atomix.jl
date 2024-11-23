@@ -1,13 +1,20 @@
-module TestCore
-
-import AtomixMetal
-
-using Atomix
 using Metal
 using Metal: @allowscalar
-using Test
 
-using ..Utils: metal
+
+@testset "AtomixMetalExt:extension_found" begin
+    @test !isnothing(Base.get_extension(Atomix, :AtomixMetalExt))
+end
+
+
+function metal(f)
+    function g()
+        f()
+        nothing
+    end
+    Metal.@metal g()
+end
+
 
 # Not implemented:
 #=
@@ -24,7 +31,8 @@ function test_get_set()
 end
 =#
 
-function test_cas()
+
+@testset "AtomixMetalExt:test_cas" begin
     idx = (
         data = 1,
         cas1_ok = 2,
@@ -47,7 +55,8 @@ function test_cas()
     @test collect(A) == [42, 1, 1]
 end
 
-function test_inc()
+
+@testset "AtomixMetalExt:test_inc" begin
     A = Metal.MtlVector(Int32(1):Int32(3))
     metal() do
         GC.@preserve A begin
@@ -60,4 +69,13 @@ function test_inc()
     @test collect(A) == [2, 1, 2]
 end
 
-end  # module
+
+@testset "AtomixMetalExt:test_inc_sugar" begin
+    A = Metal.ones(Int32, 3)
+    metal() do
+        GC.@preserve A begin
+            @atomic A[begin] += 1
+        end
+    end
+    @test collect(A) == [2, 1, 1]
+end
