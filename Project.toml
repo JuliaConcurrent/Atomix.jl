@@ -5,7 +5,6 @@ version = "1.0.0"
 
 [deps]
 UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"
-oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
 
 [weakdeps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
