@@ -1,6 +1,6 @@
 using OpenCL, pocl_jll
 using OpenCL: @allowscalar
-
+cl.platform!("pocl")
 
 @testset "AtomixOpenCLExt:extension_found" begin
     @test !isnothing(Base.get_extension(Atomix, :AtomixOpenCLExt))
