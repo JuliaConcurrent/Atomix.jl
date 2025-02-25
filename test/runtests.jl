@@ -149,4 +149,8 @@ elseif "--oneAPI" in ARGS
     import Pkg
     Pkg.add("oneAPI")
     include("test_atomix_oneapi.jl")
+elseif "--OpenCL" in ARGS
+    import Pkg
+    Pkg.add(["OpenCL", "pocl_jll"])
+    include("test_atomix_opencl.jl")
 end
