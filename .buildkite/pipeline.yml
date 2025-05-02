@@ -1,8 +1,13 @@
 steps:
-  - label: "CUDA.jl"
+  - label: "CUDA.jl {{matrix.version}}"
+    matrix:
+      setup:
+        version:
+          - "1.10"
+          - "1.11"
     plugins:
       - JuliaCI/julia#v1:
-          version: "1.10"
+          version: "{{matrix.version}}"
     command: |
       julia -e 'using Pkg
 
@@ -18,10 +23,15 @@ steps:
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
 
-  - label: "Metal.jl"
+  - label: "Metal.jl {{matrix.version}}"
+    matrix:
+      setup:
+        version:
+          - "1.10"
+          - "1.11"
     plugins:
       - JuliaCI/julia#v1:
-          version: "1.10"
+          version: "{{matrix.version}}"
     command: |
       julia -e 'using Pkg
 
@@ -38,10 +48,15 @@ steps:
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
 
-  - label: "oneAPI.jl"
+  - label: "oneAPI.jl {{matrix.version}}"
+    matrix:
+      setup:
+        version:
+          - "1.10"
+          - "1.11"
     plugins:
       - JuliaCI/julia#v1:
-          version: "1.10"
+          version: "{{matrix.version}}"
     command: |
       julia -e 'using Pkg
 
@@ -57,10 +72,15 @@ steps:
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
 
-  - label: "OpenCL.jl"
+  - label: "OpenCL.jl {{matrix.version}}"
+    matrix:
+      setup:
+        version:
+          - "1.10"
+          - "1.11"
     plugins:
       - JuliaCI/julia#v1:
-          version: "1.10"
+          version: "{{matrix.version}}"
     command: |
       julia -e 'using Pkg
 
