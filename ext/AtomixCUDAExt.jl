@@ -1,17 +1,19 @@
 # TODO: respect ordering
 module AtomixCUDAExt
 
-using Atomix: Atomix, IndexableRef
+using Atomix: Atomix, IndexableRef, UnsafeAtomics
 using CUDA: CUDA, CuDeviceArray
 
 const CuIndexableRef{Indexable<:CuDeviceArray} = IndexableRef{Indexable}
 
 function Atomix.get(ref::CuIndexableRef, order)
-    error("not implemented")
+    ptr = Atomix.pointer(ref)
+    return UnsafeAtomics.load(ptr, order)
 end
 
 function Atomix.set!(ref::CuIndexableRef, v, order)
-    error("not implemented")
+    ptr = Atomix.pointer(ref)
+    return UnsafeAtomics.store!(ptr, v, order)
 end
 
 @inline function Atomix.replace!(
@@ -51,7 +53,7 @@ end
         elseif op === Atomix.right
             CUDA.atomic_xchg!(ptr, x)
         else
-            error("not implemented")
+            return UnsafeAtomics.modify(ptr, op, x)
         end
     end
     return old => op(old, x)
