@@ -6,14 +6,62 @@ using CUDA: CUDA, CuDeviceArray
 
 const CuIndexableRef{Indexable<:CuDeviceArray} = IndexableRef{Indexable}
 
+# from https://github.com/JuliaGPU/CUDA.jl/pull/1644
+# function atomic_load(ptr::LLVMPtr{T}, order, scope::System=System()) where T
+#     if order == Acq_Rel() || order == Release()
+#         assert(false)
+#     end
+#     if compute_capability() >= sv"7.0"
+#         if order == Relaxed()
+#             val = __load(ptr, Relaxed(), scope)
+#             return val
+#         end
+#         if order == Seq_Cst()
+#             atomic_thread_fence(Seq_Cst(), scope)
+#         end
+#         val = __load(ptr, Acquire(), scope)
+#         return val
+#     else
+#         if order == Seq_Cst()
+#             atomic_thread_fence(Seq_Cst(), scope)
+#         end
+#         val = __load_volatile(ptr)
+#         if order == Relaxed()
+#             return val
+#         end
+#         atomic_thread_fence(order, scope)
+#         return val
+#     end
+# end
+
 function Atomix.get(ref::CuIndexableRef, order)
     ptr = Atomix.pointer(ref)
-    return UnsafeAtomics.load(ptr, order)
+    return UnsafeAtomics.load(ptr, UnsafeAtomics.monotonic)
 end
 
+# function atomic_store!(ptr::LLVMPtr{T}, val::T, order, scope::System=System()) where T
+#     if order == Acq_Rel() || order == Consume() || order == Acquire()
+#         assert(false)
+#     end
+#     if compute_capability() >= sv"7.0"
+#         if order == Release()
+#             __store!(ptr, val, Release(), scope)
+#             return
+#         end
+#         if order == Seq_Cst()
+#             atomic_thread_fence(Seq_Cst(), scope)
+#         end
+#         __store!(ptr, val, Relaxed(), scope)
+#     else
+#         if order == Seq_Cst()
+#             atomic_thread_fence(Seq_Cst(), scope)
+#         end
+#         __store_volatile!(ptr, val)
+#     end
+# end
 function Atomix.set!(ref::CuIndexableRef, v, order)
     ptr = Atomix.pointer(ref)
-    return UnsafeAtomics.store!(ptr, v, order)
+    return UnsafeAtomics.store!(ptr, v, UnsafeAtomics.monotonic)
 end
 
 @inline function Atomix.replace!(
@@ -53,7 +101,7 @@ end
         elseif op === Atomix.right
             CUDA.atomic_xchg!(ptr, x)
         else
-            return UnsafeAtomics.modify(ptr, op, x)
+            return UnsafeAtomics.modify(ptr, op, x, UnsafeAtomics.monotonic)
         end
     end
     return old => op(old, x)
