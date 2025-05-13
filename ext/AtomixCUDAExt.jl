@@ -1,7 +1,8 @@
 # TODO: respect ordering
 module AtomixCUDAExt
 
-using Atomix: Atomix, IndexableRef, UnsafeAtomics
+using Atomix: Atomix, IndexableRef
+using Atomix.Internal: UnsafeAtomics
 using CUDA: CUDA, CuDeviceArray
 
 const CuIndexableRef{Indexable<:CuDeviceArray} = IndexableRef{Indexable}
