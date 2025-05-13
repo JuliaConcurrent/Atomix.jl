@@ -15,10 +15,7 @@ function cuda(f)
     CUDA.@cuda g()
 end
 
-
-# Not implemented:
-#=
-function test_get_set()
+@testset "AtomixCUDAExt:test_get_set" begin
     A = CUDA.ones(Int, 3)
     cuda() do
         GC.@preserve A begin
@@ -29,8 +26,6 @@ function test_get_set()
     end
     @test collect(A) == [-1, 1, 1]
 end
-=#
-
 
 @testset "AtomixCUDAExt:test_cas" begin
     idx = (
