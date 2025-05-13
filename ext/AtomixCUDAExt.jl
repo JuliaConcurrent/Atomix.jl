@@ -48,6 +48,8 @@ end
             CUDA.atomic_min!(ptr, x)
         elseif op === max
             CUDA.atomic_max!(ptr, x)
+        elseif op === Atomix.right
+            CUDA.atomic_xchg!(ptr, x)
         else
             error("not implemented")
         end
