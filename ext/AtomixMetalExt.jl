@@ -2,7 +2,7 @@
 module AtomixMetalExt
 
 using Atomix: Atomix, IndexableRef
-using Metal: Metal, MtlDeviceArray, MtlDeviceVector
+using Metal: Metal, MtlDeviceArray
 
 const MtlIndexableRef{Indexable<:MtlDeviceArray} = IndexableRef{Indexable}
 
@@ -32,7 +32,7 @@ end
 
 
 # CAS is needed for FP ops on ThreadGroup memory
-@inline function Atomix.modify!(ref::IndexableRef{<:MtlDeviceVector{<:AbstractFloat, Metal.AS.ThreadGroup}} , op::OP, x, order) where {OP}
+@inline function Atomix.modify!(ref::IndexableRef{<:MtlDeviceArray{<:AbstractFloat, <:Any, Metal.AS.ThreadGroup}} , op::OP, x, order) where {OP}
     x = convert(eltype(ref), x)
     ptr = Atomix.pointer(ref)
     begin
