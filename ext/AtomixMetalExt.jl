@@ -2,7 +2,7 @@
 module AtomixMetalExt
 
 using Atomix: Atomix, IndexableRef
-using Metal: Metal, MtlDeviceArray
+using Metal: Metal, MtlDeviceArray, MtlDeviceVector
 
 const MtlIndexableRef{Indexable<:MtlDeviceArray} = IndexableRef{Indexable}
 
@@ -28,6 +28,21 @@ end
         old = Metal.atomic_compare_exchange_weak_explicit(ptr, expected, desired)
     end
     return (; old = old, success = old === expected)
+end
+
+
+# CAS is needed for FP ops on ThreadGroup memory
+@inline function Atomix.modify!(ref::IndexableRef{<:MtlDeviceVector{<:AbstractFloat, Metal.AS.ThreadGroup}} , op::OP, x, order) where {OP}
+    x = convert(eltype(ref), x)
+    ptr = Atomix.pointer(ref)
+    begin
+        old = if op === (+) || op === (-)
+            Metal.atomic_fetch_op_explicit(ptr, op, x)
+        else
+            error("not implemented")
+        end
+    end
+    return old => op(old, x)
 end
 
 @inline function Atomix.modify!(ref::MtlIndexableRef, op::OP, x, order) where {OP}
