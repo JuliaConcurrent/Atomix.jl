@@ -74,6 +74,7 @@ end
     metal() do
         GC.@preserve A begin
             B = Metal.MtlThreadGroupArray(Float32, 3)
+            B[1] = A[1]
             refB = Atomix.IndexableRef(B, (1,))
             pre, post = Atomix.modify!(refB, +, Float32(1))
             A[1] = B[1]
