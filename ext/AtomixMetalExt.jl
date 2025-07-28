@@ -36,11 +36,7 @@ end
     x = convert(eltype(ref), x)
     ptr = Atomix.pointer(ref)
     begin
-        old = if op === (+) || op === (-)
-            Metal.atomic_fetch_op_explicit(ptr, op, x)
-        else
-            error("not implemented")
-        end
+        Metal.atomic_fetch_op_explicit(ptr, op, x)
     end
     return old => op(old, x)
 end
