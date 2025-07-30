@@ -35,9 +35,7 @@ end
 @inline function Atomix.modify!(ref::IndexableRef{<:MtlDeviceArray{<:AbstractFloat, <:Any, Metal.AS.ThreadGroup}} , op::OP, x, order) where {OP}
     x = convert(eltype(ref), x)
     ptr = Atomix.pointer(ref)
-    begin
-        Metal.atomic_fetch_op_explicit(ptr, op, x)
-    end
+    old = Metal.atomic_fetch_op_explicit(ptr, op, x)
     return old => op(old, x)
 end
 
