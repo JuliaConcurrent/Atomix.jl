@@ -95,5 +95,3 @@ end
     end
     @test collect(A) == [2, 1, 1]
 end
-
-end
