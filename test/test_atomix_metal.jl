@@ -69,6 +69,22 @@ end
     @test collect(A) == [2, 1, 2]
 end
 
+@testset "AtomixMetalExt:test_inc_threadgroup" begin
+    A = Metal.MtlVector(Float32(1):Float32(3))
+    metal() do
+        GC.@preserve A begin
+            B = Metal.MtlThreadGroupArray(Float32, 3)
+            B[1] = A[1]
+            refB = Atomix.IndexableRef(B, (1,))
+            pre, post = Atomix.modify!(refB, +, Float32(1))
+            A[1] = B[1]
+            A[2] = pre
+            A[3] = post
+        end
+    end
+    @test collect(A) == Float32[2, 1, 2]
+end
+
 
 @testset "AtomixMetalExt:test_inc_sugar" begin
     A = Metal.ones(Int32, 3)

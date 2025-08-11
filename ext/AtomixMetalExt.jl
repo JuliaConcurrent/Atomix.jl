@@ -30,6 +30,15 @@ end
     return (; old = old, success = old === expected)
 end
 
+
+# CAS is needed for FP ops on ThreadGroup memory
+@inline function Atomix.modify!(ref::IndexableRef{<:MtlDeviceArray{<:AbstractFloat, <:Any, Metal.AS.ThreadGroup}} , op::OP, x, order) where {OP}
+    x = convert(eltype(ref), x)
+    ptr = Atomix.pointer(ref)
+    old = Metal.atomic_fetch_op_explicit(ptr, op, x)
+    return old => op(old, x)
+end
+
 @inline function Atomix.modify!(ref::MtlIndexableRef, op::OP, x, order) where {OP}
     x = convert(eltype(ref), x)
     ptr = Atomix.pointer(ref)

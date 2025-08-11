@@ -20,7 +20,7 @@ AtomixOpenCLExt = "OpenCL"
 
 [compat]
 CUDA = "5"
-Metal = "1"
+Metal = "1.7"
 oneAPI = "1, 2"
 OpenCL = "^0.10"
 UnsafeAtomics = "0.1, 0.2, 0.3"
