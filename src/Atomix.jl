@@ -31,7 +31,6 @@ using UnsafeAtomics:
     Ordering, UnsafeAtomics, monotonic, acquire, release, acq_rel, seq_cst, right
 
 include("utils.jl")
-include("complex.jl")
 include("references.jl")
 include("generic.jl")
 include("core.jl")

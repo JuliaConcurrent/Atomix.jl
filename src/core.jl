@@ -49,42 +49,49 @@ _atomic_cas!(ptr::Ptr{T}, expected::T, desired::T, success_order, failure_order)
 _atomic_modify!(ptr::Ptr{T}, op::OP, x::T, ord) where {T,OP} =
     UnsafeAtomics.modify!(ptr, op, x, ord)
 
-# Complex atomic operations via integer reinterpretation
-# Note: Can't use Core.LLVMPtr here since Ptr is not a subtype of Core.LLVMPtr
-# So we need separate implementations for CPU (Ptr) and GPU (Core.LLVMPtr)
-
-@inline function _atomic_cas!(ptr::Ptr{Complex{T}}, expected::Complex{T}, desired::Complex{T}, success_order, failure_order) where {T<:Union{Float32,Float64}}
-    IntType = _int_type_for_complex(Complex{T})
-    int_ptr = reinterpret(Ptr{IntType}, ptr)
-    expected_i = reinterpret(IntType, expected)
-    desired_i = reinterpret(IntType, desired)
-    result = UnsafeAtomics.cas!(int_ptr, expected_i, desired_i, success_order, failure_order)
-    return (old = reinterpret(Complex{T}, result.old), success = result.success)
-end
+# Complex atomic operations via separate operations on real and imaginary parts
+# This provides per-component atomicity (not full Complex atomicity)
 
 @inline function _atomic_load(ptr::Ptr{Complex{T}}, order) where {T<:Union{Float32,Float64}}
-    IntType = _int_type_for_complex(Complex{T})
-    int_ptr = reinterpret(Ptr{IntType}, ptr)
-    result = UnsafeAtomics.load(int_ptr, order)
-    return reinterpret(Complex{T}, result)
+    ptr_re = reinterpret(Ptr{T}, ptr)
+    ptr_im = reinterpret(Ptr{T}, ptr + sizeof(T))
+    re = UnsafeAtomics.load(ptr_re, order)
+    im = UnsafeAtomics.load(ptr_im, order)
+    return Complex{T}(re, im)
 end
 
 @inline function _atomic_store!(ptr::Ptr{Complex{T}}, val::Complex{T}, order) where {T<:Union{Float32,Float64}}
-    IntType = _int_type_for_complex(Complex{T})
-    int_ptr = reinterpret(Ptr{IntType}, ptr)
-    val_i = reinterpret(IntType, val)
-    UnsafeAtomics.store!(int_ptr, val_i, order)
+    ptr_re = reinterpret(Ptr{T}, ptr)
+    ptr_im = reinterpret(Ptr{T}, ptr + sizeof(T))
+    UnsafeAtomics.store!(ptr_re, val.re, order)
+    UnsafeAtomics.store!(ptr_im, val.im, order)
 end
 
-# CAS loop fallback for Complex modify! (following CUDA.jl pattern)
+@inline function _atomic_cas!(ptr::Ptr{Complex{T}}, expected::Complex{T}, desired::Complex{T}, success_order, failure_order) where {T<:Union{Float32,Float64}}
+    ptr_re = reinterpret(Ptr{T}, ptr)
+    ptr_im = reinterpret(Ptr{T}, ptr + sizeof(T))
+    
+    # CAS on real part
+    result_re = UnsafeAtomics.cas!(ptr_re, expected.re, desired.re, success_order, failure_order)
+    # CAS on imaginary part
+    result_im = UnsafeAtomics.cas!(ptr_im, expected.im, desired.im, success_order, failure_order)
+    
+    # Both must succeed for overall success
+    success = result_re.success && result_im.success
+    return (old = Complex{T}(result_re.old, result_im.old), success = success)
+end
+
 @inline function _atomic_modify!(ptr::Ptr{Complex{T}}, op::OP, x::Complex{T}, ord) where {T<:Union{Float32,Float64},OP}
-    old = _atomic_load(ptr, ord)
-    while true
-        new = op(old, x)
-        result = _atomic_cas!(ptr, old, new, ord, ord)
-        result.success && return (old => new)
-        old = result.old
-    end
+    ptr_re = reinterpret(Ptr{T}, ptr)
+    ptr_im = reinterpret(Ptr{T}, ptr + sizeof(T))
+    
+    # Most operations can be decomposed component-wise for Complex numbers
+    # This provides per-component atomicity, not full Complex-level atomicity
+    result_re = UnsafeAtomics.modify!(ptr_re, op, x.re, ord)
+    result_im = UnsafeAtomics.modify!(ptr_im, op, x.im, ord)
+    old = Complex{T}(first(result_re), first(result_im))
+    new = Complex{T}(last(result_re), last(result_im))
+    return old => new
 end
 
 Atomix.asstorable(ref, v) = convert(eltype(ref), v)
