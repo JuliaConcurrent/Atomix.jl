@@ -36,23 +36,48 @@ end
     end
 end
 
-# Generic atomic operations - dispatch on type
+# Native atomic operations for non-Complex types
 _atomic_load(ptr::Ptr{T}, order) where {T} = 
-    _with_int_repr(UnsafeAtomics.load, ptr, order)
+    UnsafeAtomics.load(ptr, order)
 
 _atomic_store!(ptr::Ptr{T}, val::T, order) where {T} = 
-    _with_int_repr(UnsafeAtomics.store!, ptr, val, order)
+    UnsafeAtomics.store!(ptr, val, order)
 
 _atomic_cas!(ptr::Ptr{T}, expected::T, desired::T, success_order, failure_order) where {T} = 
-    _with_int_repr(UnsafeAtomics.cas!, ptr, expected, desired, success_order, failure_order)
+    UnsafeAtomics.cas!(ptr, expected, desired, success_order, failure_order)
 
-# Multiple dispatch for modify! - native atomics for non-Complex types
-function _atomic_modify!(ptr::Ptr{T}, op::OP, x::T, ord) where {T,OP}
+_atomic_modify!(ptr::Ptr{T}, op::OP, x::T, ord) where {T,OP} =
     UnsafeAtomics.modify!(ptr, op, x, ord)
+
+# Complex atomic operations via integer reinterpretation
+# Note: Can't use Core.LLVMPtr here since Ptr is not a subtype of Core.LLVMPtr
+# So we need separate implementations for CPU (Ptr) and GPU (Core.LLVMPtr)
+
+@inline function _atomic_cas!(ptr::Ptr{Complex{T}}, expected::Complex{T}, desired::Complex{T}, success_order, failure_order) where {T<:Union{Float32,Float64}}
+    IntType = _int_type_for_complex(Complex{T})
+    int_ptr = reinterpret(Ptr{IntType}, ptr)
+    expected_i = reinterpret(IntType, expected)
+    desired_i = reinterpret(IntType, desired)
+    result = UnsafeAtomics.cas!(int_ptr, expected_i, desired_i, success_order, failure_order)
+    return (old = reinterpret(Complex{T}, result.old), success = result.success)
 end
 
-# CAS loop fallback for Complex types (no native atomic modify!)
-function _atomic_modify!(ptr::Ptr{Complex{T}}, op::OP, x::Complex{T}, ord) where {T,OP}
+@inline function _atomic_load(ptr::Ptr{Complex{T}}, order) where {T<:Union{Float32,Float64}}
+    IntType = _int_type_for_complex(Complex{T})
+    int_ptr = reinterpret(Ptr{IntType}, ptr)
+    result = UnsafeAtomics.load(int_ptr, order)
+    return reinterpret(Complex{T}, result)
+end
+
+@inline function _atomic_store!(ptr::Ptr{Complex{T}}, val::Complex{T}, order) where {T<:Union{Float32,Float64}}
+    IntType = _int_type_for_complex(Complex{T})
+    int_ptr = reinterpret(Ptr{IntType}, ptr)
+    val_i = reinterpret(IntType, val)
+    UnsafeAtomics.store!(int_ptr, val_i, order)
+end
+
+# CAS loop fallback for Complex modify! (following CUDA.jl pattern)
+@inline function _atomic_modify!(ptr::Ptr{Complex{T}}, op::OP, x::Complex{T}, ord) where {T<:Union{Float32,Float64},OP}
     old = _atomic_load(ptr, ord)
     while true
         new = op(old, x)
@@ -61,28 +86,5 @@ function _atomic_modify!(ptr::Ptr{Complex{T}}, op::OP, x::Complex{T}, ord) where
         old = result.old
     end
 end
-
-# Helper: apply atomic operation with integer reinterpretation for Complex types
-function _with_int_repr(f, ptr::Ptr{Complex{T}}, args...) where {T}
-    IntType = _int_type_for_complex(T)
-    int_ptr = reinterpret(Ptr{IntType}, ptr)
-    result = f(int_ptr, _to_int.(IntType, args)...)
-    return _from_int(Complex{T}, result)
-end
-
-_with_int_repr(f, ptr::Ptr{T}, args...) where {T} = f(ptr, args...)
-
-# Integer type mapping for Complex types
-_int_type_for_complex(::Type{Float32}) = UInt64
-_int_type_for_complex(::Type{Float64}) = UInt128
-
-# Convert to/from integer representation
-_to_int(::Type{I}, x::Complex{T}) where {I,T} = reinterpret(I, x)
-_to_int(::Type{I}, x) where {I} = x
-
-_from_int(::Type{Complex{T}}, x::Integer) where {T} = reinterpret(Complex{T}, x)
-_from_int(::Type{Complex{T}}, result::NamedTuple) where {T} = 
-    (old = reinterpret(Complex{T}, result.old), success = result.success)
-_from_int(::Type{T}, x) where {T} = x
 
 Atomix.asstorable(ref, v) = convert(eltype(ref), v)
