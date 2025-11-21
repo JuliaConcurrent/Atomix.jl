@@ -1,7 +1,7 @@
 # TODO: respect ordering
 module AtomixMetalExt
 
-using Atomix: Atomix, IndexableRef
+using Atomix: Atomix, IndexableRef, right
 using Metal: Metal, MtlDeviceArray
 
 const MtlIndexableRef{Indexable<:MtlDeviceArray} = IndexableRef{Indexable}
@@ -57,6 +57,8 @@ end
             Metal.atomic_fetch_min_explicit(ptr, x)
         elseif op === max
             Metal.atomic_fetch_max_explicit(ptr, x)
+        elseif op === right
+            Metal.atomic_exchange_explicit(ptr, x)
         else
             error("not implemented")
         end

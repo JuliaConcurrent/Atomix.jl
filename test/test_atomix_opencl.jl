@@ -79,3 +79,15 @@ end
     end
     @test collect(A) == [2, 1, 1]
 end
+
+@testset "AtomixOpenCLExt:test_swap_sugar" begin
+    A = OpenCL.ones(Int32, 3)
+    B = OpenCL.zeros(Int32, 3)
+    opencl() do
+        GC.@preserve A B begin
+            B[begin] = @atomicswap A[begin] = 4
+        end
+    end
+    @test collect(A) == [4, 1, 1]
+    @test collect(B) == [1, 0, 0]
+end

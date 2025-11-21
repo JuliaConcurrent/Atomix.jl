@@ -1,7 +1,7 @@
 # TODO: respect ordering
 module AtomixoneAPIExt
 
-using Atomix: Atomix, IndexableRef
+using Atomix: Atomix, IndexableRef, right
 using oneAPI: oneAPI, oneDeviceArray
 
 const oneIndexableRef{Indexable<:oneDeviceArray} = IndexableRef{Indexable}
@@ -48,6 +48,8 @@ end
             oneAPI.atomic_min!(ptr, x)
         elseif op === max
             oneAPI.atomic_max!(ptr, x)
+        elseif op === right
+            oneAPI.atomic_xchg!(ptr, x)
         else
             error("not implemented")
         end

@@ -1,7 +1,7 @@
 # TODO: respect ordering
 module AtomixOpenCLExt
 
-using Atomix: Atomix, IndexableRef
+using Atomix: Atomix, IndexableRef, right
 using OpenCL: SPIRVIntrinsics, CLDeviceArray
 
 const CLIndexableRef{Indexable<:CLDeviceArray} = IndexableRef{Indexable}
@@ -48,6 +48,8 @@ end
             SPIRVIntrinsics.atomic_min!(ptr, x)
         elseif op === max
             SPIRVIntrinsics.atomic_max!(ptr, x)
+        elseif op === right
+            SPIRVIntrinsics.atomic_xchg!(ptr, x)
         else
             error("not implemented")
         end
