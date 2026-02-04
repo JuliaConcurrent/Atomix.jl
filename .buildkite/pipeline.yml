@@ -17,7 +17,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--CUDA"])'
+                Pkg.test("Atomix", test_args=["--CUDA"], julia_args=["--depwarn=yes"])'
     agents:
       queue: "juliagpu"
       cuda: "*"
@@ -42,7 +42,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--Metal"])'
+                Pkg.test("Atomix", test_args=["--Metal"], julia_args=["--depwarn=yes"])'
     agents:
       queue: "juliaecosystem"
       os: "macos"
@@ -68,7 +68,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--oneAPI"])'
+                Pkg.test("Atomix", test_args=["--oneAPI"], julia_args=["--depwarn=yes"])'
     agents:
       queue: "juliagpu"
       intel: "*"
@@ -93,7 +93,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--OpenCL"])'
+                Pkg.test("Atomix", test_args=["--OpenCL"], julia_args=["--depwarn=yes"])'
     agents:
       queue: "juliagpu"
       intel: "*"

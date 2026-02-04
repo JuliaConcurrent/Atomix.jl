@@ -10,6 +10,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      JULIA_DEPWARN: 'yes'
     strategy:
       matrix:
         julia-version:
