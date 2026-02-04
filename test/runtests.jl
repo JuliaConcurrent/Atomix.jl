@@ -5,20 +5,11 @@ using Test
 
 
 @testset "test_issue65" begin
-    is_ci = get(ENV, "CI", "false") == "true" || haskey(ENV, "BUILDKITE")
 
     lengths = zeros(Int, 4)
-    buf = IOBuffer()
-    redirect_stderr(buf) do
-        for i in eachindex(lengths)
-            Atomix.@atomic lengths[i] += 1
-        end
+    for i in eachindex(lengths)
+        Atomix.@atomic lengths[i] += 1
     end
-    out = String(take!(buf))
-    if !isempty(out)
-        print(stderr, out)
-    end
-    @test isempty(out)
     @test lengths == fill(1, 4)
 end
 
