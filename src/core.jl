@@ -30,7 +30,11 @@ end
     ptr = Atomix.pointer(ref)
     root = Atomix.gcroot(ref)
     GC.@preserve root begin
-        UnsafeAtomics.modify!(ptr, op, x, ord)
+        if isdefined(Core.Intrinsics, :atomic_pointermodify)
+            Core.Intrinsics.atomic_pointermodify(ptr, op, x, base_ordering(ord))
+        else
+            UnsafeAtomics.modify!(ptr, op, x, ord)
+        end
     end
 end
 

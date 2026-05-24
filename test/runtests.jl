@@ -4,6 +4,16 @@ using Atomix: @atomic, @atomicreplace, @atomicswap
 using Test
 
 
+@testset "test_issue65" begin
+
+    lengths = zeros(Int, 4)
+    for i in eachindex(lengths)
+        Atomix.@atomic lengths[i] += 1
+    end
+    @test lengths == fill(1, 4)
+end
+
+
 @testset "Aqua.jl" begin
     using Aqua
     Aqua.test_all(Atomix)
@@ -45,7 +55,7 @@ end
     mutable struct Atomic{T}
         @atomic x::T
     end
-    
+
     a = Atomic(123)
     @test (@atomic a.x) == 123
     @test (@atomic :monotonic a.x) == 123

@@ -5,6 +5,7 @@ steps:
         version:
           - "1.10"
           - "1.11"
+          - "1.12"
     plugins:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
@@ -16,7 +17,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--CUDA"])'
+                Pkg.test("Atomix", test_args=["--CUDA"], julia_args=["--depwarn=error"])'
     agents:
       queue: "juliagpu"
       cuda: "*"
@@ -29,6 +30,7 @@ steps:
         version:
           - "1.10"
           - "1.11"
+          - "1.12"
     plugins:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
@@ -40,7 +42,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--Metal"])'
+                Pkg.test("Atomix", test_args=["--Metal"], julia_args=["--depwarn=error"])'
     agents:
       queue: "juliaecosystem"
       os: "macos"
@@ -54,6 +56,7 @@ steps:
         version:
           - "1.10"
           - "1.11"
+          - "1.12"
     plugins:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
@@ -65,7 +68,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--oneAPI"])'
+                Pkg.test("Atomix", test_args=["--oneAPI"], julia_args=["--depwarn=error"])'
     agents:
       queue: "juliagpu"
       intel: "*"
@@ -78,6 +81,7 @@ steps:
         version:
           - "1.10"
           - "1.11"
+          - "1.12"
     plugins:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
@@ -89,7 +93,7 @@ steps:
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--OpenCL"])'
+                Pkg.test("Atomix", test_args=["--OpenCL"], julia_args=["--depwarn=error"])'
     agents:
       queue: "juliagpu"
       intel: "*"
