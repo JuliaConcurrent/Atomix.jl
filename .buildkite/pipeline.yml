@@ -18,33 +18,7 @@ steps:
                 println("+++ :julia: Running tests")
                 Pkg.test("Atomix", test_args=["--CUDA"])'
     agents:
-      queue: "juliagpu"
-      cuda: "*"
-    if: build.message !~ /\[skip tests\]/
-    timeout_in_minutes: 15
-
-  - label: "Metal.jl {{matrix.version}}"
-    matrix:
-      setup:
-        version:
-          - "1.10"
-          - "1.11"
-    plugins:
-      - JuliaCI/julia#v1:
-          version: "{{matrix.version}}"
-    command: |
-      julia -e 'using Pkg
-
-                println("--- :julia: Instantiating environment")
-                Pkg.add("Metal")
-                Pkg.develop(PackageSpec(name="Atomix", path="."))
-
-                println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--Metal"])'
-    agents:
-      queue: "juliaecosystem"
-      os: "macos"
-      arch: "aarch64"
+      queue: "cuda"
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
 
@@ -67,8 +41,7 @@ steps:
                 println("+++ :julia: Running tests")
                 Pkg.test("Atomix", test_args=["--oneAPI"])'
     agents:
-      queue: "juliagpu"
-      intel: "*"
+      queue: "oneapi"
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
 
@@ -91,7 +64,6 @@ steps:
                 println("+++ :julia: Running tests")
                 Pkg.test("Atomix", test_args=["--OpenCL"])'
     agents:
-      queue: "juliagpu"
-      intel: "*"
+      queue: "oneapi"
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
