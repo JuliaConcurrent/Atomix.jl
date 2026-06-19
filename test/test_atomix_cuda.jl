@@ -79,3 +79,51 @@ end
     end
     @test collect(A) == [2, 1, 1]
 end
+
+
+@testset "AtomixCUDAExt:test_complex_cas" begin
+    A = CUDA.zeros(ComplexF64, 3)
+    cuda() do
+        GC.@preserve A begin
+            ref = Atomix.IndexableRef(A, (1,))
+            (old, success) = Atomix.replace!(ref, ComplexF64(0.0, 0.0), ComplexF64(1.0, 2.0))
+            A[2] = old
+            A[3] = success ? ComplexF64(1.0) : ComplexF64(0.0)
+        end
+    end
+    result = collect(A)
+    @test result[1] == ComplexF64(1.0, 2.0)
+    @test result[2] == ComplexF64(0.0, 0.0)
+    @test result[3] == ComplexF64(1.0)
+end
+
+
+@testset "AtomixCUDAExt:test_complex_modify" begin
+    A = CUDA.fill(ComplexF64(1.0, 2.0), 3)
+    cuda() do
+        GC.@preserve A begin
+            ref = Atomix.IndexableRef(A, (1,))
+            pre, post = Atomix.modify!(ref, +, ComplexF64(3.0, 4.0))
+            A[2] = pre
+            A[3] = post
+        end
+    end
+    result = collect(A)
+    @test result[1] == ComplexF64(4.0, 6.0)
+    @test result[2] == ComplexF64(1.0, 2.0)
+    @test result[3] == ComplexF64(4.0, 6.0)
+end
+
+
+@testset "AtomixCUDAExt:test_complex_sugar" begin
+    A = CUDA.ones(ComplexF64, 3)
+    cuda() do
+        GC.@preserve A begin
+            @atomic A[begin] += ComplexF64(2.0, 3.0)
+        end
+    end
+    result = collect(A)
+    @test result[1] == ComplexF64(3.0, 3.0)
+    @test result[2] == ComplexF64(1.0, 0.0)
+    @test result[3] == ComplexF64(1.0, 0.0)
+end

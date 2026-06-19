@@ -133,6 +133,35 @@ end
 end
 
 
+@testset "test_complex" begin
+    # Test ComplexF64 basic operations
+    A = ones(ComplexF64, 3)
+    @test (@atomic A[1]) === ComplexF64(1, 0)
+    @atomic A[1] = ComplexF64(2, 3)
+    @test A[1] === ComplexF64(2, 3)
+    @test (@atomic A[1] += ComplexF64(1, 1)) === ComplexF64(3, 4)
+    @test A[1] === ComplexF64(3, 4)
+    @test (@atomicswap A[1] = ComplexF64(10, 10)) === ComplexF64(3, 4)
+    @test A[1] === ComplexF64(10, 10)
+    @test (@atomicreplace A[1] ComplexF64(10, 10) => ComplexF64(5, 5)) ==
+          (old = ComplexF64(10, 10), success = true)
+    @test (@atomicreplace A[1] ComplexF64(99, 99) => ComplexF64(1, 1)) ==
+          (old = ComplexF64(5, 5), success = false)
+    
+    # Test ComplexF32
+    B = ones(ComplexF32, 3)
+    @test (@atomic B[1]) === ComplexF32(1, 0)
+    @test (@atomic B[1] += ComplexF32(1, 1)) === ComplexF32(2, 1)
+    
+    # Test IndexableRef with Complex
+    ref = Atomix.IndexableRef(A, (1,))
+    @test Atomix.modify!(ref, +, ComplexF64(1, 1)) === (ComplexF64(5, 5) => ComplexF64(6, 6))
+    @test Atomix.swap!(ref, ComplexF64(7, 7)) == ComplexF64(6, 6)
+    @test Atomix.replace!(ref, ComplexF64(7, 7), ComplexF64(8, 8)) ===
+          (old = ComplexF64(7, 7), success = true)
+end
+
+
 # KernelAbstractions backend tests
 # Pass command-line argument to test suite to install the right backend, e.g.
 #   julia> import Pkg
