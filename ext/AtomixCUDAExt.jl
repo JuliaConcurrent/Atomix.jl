@@ -1,7 +1,7 @@
 # TODO: respect ordering
 module AtomixCUDAExt
 
-using Atomix: Atomix, IndexableRef
+using Atomix: Atomix, IndexableRef, right
 using CUDA: CUDA, CuDeviceArray
 
 const CuIndexableRef{Indexable<:CuDeviceArray} = IndexableRef{Indexable}
@@ -48,6 +48,8 @@ end
             CUDA.atomic_min!(ptr, x)
         elseif op === max
             CUDA.atomic_max!(ptr, x)
+        elseif op === right
+            CUDA.atomic_xchg!(ptr, x)
         else
             error("not implemented")
         end

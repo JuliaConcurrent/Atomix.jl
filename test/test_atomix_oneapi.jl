@@ -79,3 +79,15 @@ end
     end
     @test collect(A) == [2, 1, 1]
 end
+
+@testset "AtomixoneAPIExt:test_swap_sugar" begin
+    A = oneAPI.ones(Int32, 3)
+    B = oneAPI.zeros(Int32, 3)
+    oneapi() do
+        GC.@preserve A B begin
+            B[begin] = @atomicswap A[begin] = 4
+        end
+    end
+    @test collect(A) == [4, 1, 1]
+    @test collect(B) == [1, 0, 0]
+end

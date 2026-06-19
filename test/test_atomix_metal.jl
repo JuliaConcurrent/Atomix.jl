@@ -95,3 +95,15 @@ end
     end
     @test collect(A) == [2, 1, 1]
 end
+
+@testset "AtomixMetalExt:test_swap_sugar" begin
+    A = Metal.ones(Int32, 3)
+    B = Metal.zeros(Int32, 3)
+    metal() do
+        GC.@preserve A B begin
+            B[begin] = @atomicswap A[begin] = 4
+        end
+    end
+    @test collect(A) == [4, 1, 1]
+    @test collect(B) == [1, 0, 0]
+end
