@@ -3,6 +3,7 @@ module AtomixOpenCLExt
 
 using Atomix: Atomix, IndexableRef
 using OpenCL: SPIRVIntrinsics, CLDeviceArray
+using UnsafeAtomics: Ordering
 
 const CLIndexableRef{Indexable<:CLDeviceArray} = IndexableRef{Indexable}
 
@@ -53,6 +54,13 @@ end
         end
     end
     return old => op(old, x)
+end
+
+@inline function Atomix.swap!(ref::CLIndexableRef, x, order::Ordering)
+    x = convert(eltype(ref), x)
+    ptr = Atomix.pointer(ref)
+    old = SPIRVIntrinsics.atomic_xchg!(ptr, x)
+    return old
 end
 
 end  # module AtomixOpenCLExt
