@@ -1,5 +1,6 @@
 using Metal
 using Metal: @allowscalar
+using UnsafeAtomics: UnsafeAtomics
 
 
 @testset "AtomixMetalExt:extension_found" begin
@@ -16,20 +17,19 @@ function metal(f)
 end
 
 
-# Not implemented:
-#=
-function test_get_set()
-    A = CUDA.ones(Int, 3)
-    cuda() do
+@testset "AtomixMetalExt:test_get_set" begin
+    A = Metal.ones(Int32, 3)
+    metal() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
-            x = Atomix.get(ref)
-            Atomix.set!(ref, -x)
+            Atomix.set!(ref, -Atomix.get(ref, Atomix.acquire), Atomix.release)
+            A[2] = Atomix.get(ref, Atomix.acquire)
+            Atomix.set!(ref, Int32(7), UnsafeAtomics.unordered)
+            A[3] = Atomix.get(ref, Atomix.monotonic)
         end
     end
-    @test collect(A) == [-1, 1, 1]
+    @test collect(A) == Int32[7, -1, 7]
 end
-=#
 
 
 @testset "AtomixMetalExt:test_cas" begin
@@ -83,6 +83,39 @@ end
         end
     end
     @test collect(A) == Float32[2, 1, 2]
+end
+
+
+@testset "AtomixMetalExt:test_orderings" begin
+    A = Metal.zeros(Int32, 4)
+    metal() do
+        GC.@preserve A begin
+            ref = Atomix.IndexableRef(A, (1,))
+            Atomix.modify!(ref, +, 1, UnsafeAtomics.unordered)
+            Atomix.modify!(ref, +, 1, Atomix.monotonic)
+            Atomix.modify!(ref, +, 1, Atomix.acquire)
+            Atomix.modify!(ref, +, 1, Atomix.release)
+            Atomix.modify!(ref, +, 1, Atomix.acquire_release)
+            old, success = Atomix.replace!(
+                ref,
+                5,
+                10,
+                Atomix.sequentially_consistent,
+                Atomix.acquire,
+            )
+            A[2] = old
+            A[3] = success
+            old, success = Atomix.replace!(
+                ref,
+                5,
+                11,
+                Atomix.acq_rel,
+                Atomix.sequentially_consistent,
+            )
+            A[4] = old + success
+        end
+    end
+    @test collect(A) == Int32[10, 5, 1, 10]
 end
 
 
