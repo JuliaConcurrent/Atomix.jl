@@ -17,6 +17,27 @@ function metal(f)
 end
 
 
+function compile_metal_4_1(f)
+    function g()
+        f()
+        nothing
+    end
+    return sprint() do io
+        Metal.code_llvm(
+            io,
+            g,
+            Tuple{};
+            kernel=true,
+            metal=v"4.1",
+            air=v"2.9",
+            dump_module=true,
+        )
+    end
+end
+
+
+if Metal.metal_target() >= v"4.1"
+
 @testset "AtomixMetalExt:test_get_set" begin
     A = Metal.ones(Int32, 3)
     metal() do
@@ -127,4 +148,32 @@ end
         end
     end
     @test collect(A) == [2, 1, 1]
+end
+
+else
+
+@testset "AtomixMetalExt:ordered_atomics_compile" begin
+    A = Metal.zeros(Int32, 1)
+    llvm = compile_metal_4_1() do
+        GC.@preserve A begin
+            ref = Atomix.IndexableRef(A, (1,))
+            value = Atomix.get(ref, Atomix.acquire)
+            Atomix.set!(ref, value, Atomix.release)
+            Atomix.modify!(ref, +, 1, Atomix.acquire_release)
+            Atomix.replace!(
+                ref,
+                1,
+                2,
+                Atomix.sequentially_consistent,
+                Atomix.acquire,
+            )
+        end
+    end
+    @test occursin("air.atomic", llvm)
+end
+
+@testset "AtomixMetalExt:ordered_atomics_runtime" begin
+    @test_skip Metal.metal_target() >= v"4.1"
+end
+
 end

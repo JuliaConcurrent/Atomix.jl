@@ -2,3 +2,4 @@
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"

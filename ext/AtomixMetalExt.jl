@@ -6,12 +6,12 @@ using UnsafeAtomics: UnsafeAtomics
 
 const MtlIndexableRef{Indexable<:MtlDeviceArray} = IndexableRef{Indexable}
 
-@inline metal_memory_order(::typeof(UnsafeAtomics.unordered)) = Val(Metal.memory_order_relaxed)
-@inline metal_memory_order(::typeof(UnsafeAtomics.monotonic)) = Val(Metal.memory_order_relaxed)
-@inline metal_memory_order(::typeof(UnsafeAtomics.acquire)) = Val(Metal.memory_order_acquire)
-@inline metal_memory_order(::typeof(UnsafeAtomics.release)) = Val(Metal.memory_order_release)
-@inline metal_memory_order(::typeof(UnsafeAtomics.acq_rel)) = Val(Metal.memory_order_acq_rel)
-@inline metal_memory_order(::typeof(UnsafeAtomics.seq_cst)) = Val(Metal.memory_order_seq_cst)
+@inline metal_memory_order(::typeof(UnsafeAtomics.unordered)) = Metal.memory_order_relaxed
+@inline metal_memory_order(::typeof(UnsafeAtomics.monotonic)) = Metal.memory_order_relaxed
+@inline metal_memory_order(::typeof(UnsafeAtomics.acquire)) = Metal.memory_order_acquire
+@inline metal_memory_order(::typeof(UnsafeAtomics.release)) = Metal.memory_order_release
+@inline metal_memory_order(::typeof(UnsafeAtomics.acq_rel)) = Metal.memory_order_acq_rel
+@inline metal_memory_order(::typeof(UnsafeAtomics.seq_cst)) = Metal.memory_order_seq_cst
 
 @inline function Atomix.get(ref::MtlIndexableRef, order)
     ptr = Atomix.pointer(ref)
