@@ -1,18 +1,20 @@
-# TODO: respect ordering
 module AtomixCUDAExt
 
-using Atomix: Atomix, IndexableRef
+using Atomix: Atomix, IndexableRef, right
 using CUDA: CUDA, CuDeviceArray
+using Core: LLVMPtr
 
 const CuIndexableRef{Indexable<:CuDeviceArray} = IndexableRef{Indexable}
 
-function Atomix.get(ref::CuIndexableRef, order)
-    error("not implemented")
-end
+# `Atomix.get` and `Atomix.set!` use Atomix's generic implementation: an LLVM atomic
+# load/store on the device pointer (via UnsafeAtomicsLLVM), which honors the ordering.
+#
+# `Atomix.replace!` and `Atomix.modify!` go through CUDA.jl's intrinsics. These have no
+# ordering parameter, so the requested ordering is ignored: every operation is performed
+# with CUDA's default (relaxed, device-scope) semantics.
 
-function Atomix.set!(ref::CuIndexableRef, v, order)
-    error("not implemented")
-end
+const NativeInt = Union{Int32,Int64,UInt32,UInt64}
+const NativeFloat = Union{Float32,Float64}
 
 @inline function Atomix.replace!(
     ref::CuIndexableRef,
@@ -24,35 +26,57 @@ end
     ptr = Atomix.pointer(ref)
     expected = convert(eltype(ref), expected)
     desired = convert(eltype(ref), desired)
-    begin
-        old = CUDA.atomic_cas!(ptr, expected, desired)
-    end
+    old = CUDA.atomic_cas!(ptr, expected, desired)
     return (; old = old, success = old === expected)
 end
 
 @inline function Atomix.modify!(ref::CuIndexableRef, op::OP, x, order) where {OP}
     x = convert(eltype(ref), x)
     ptr = Atomix.pointer(ref)
-    begin
-        old = if op === (+)
-            CUDA.atomic_add!(ptr, x)
-        elseif op === (-)
-            CUDA.atomic_sub!(ptr, x)
-        elseif op === (&)
-            CUDA.atomic_and!(ptr, x)
-        elseif op === (|)
-            CUDA.atomic_or!(ptr, x)
-        elseif op === xor
-            CUDA.atomic_xor!(ptr, x)
-        elseif op === min
-            CUDA.atomic_min!(ptr, x)
-        elseif op === max
-            CUDA.atomic_max!(ptr, x)
-        else
-            error("not implemented")
-        end
-    end
+    old = modify_native!(ptr, op, x)
     return old => op(old, x)
+end
+
+# operations with a native atomic instruction
+for (op, fn) in [(+) => :atomic_add!, (-) => :atomic_sub!, (&) => :atomic_and!,
+                 (|) => :atomic_or!, xor => :atomic_xor!, min => :atomic_min!,
+                 max => :atomic_max!]
+    @eval @inline modify_native!(ptr::LLVMPtr{<:NativeInt}, ::typeof($op), x) =
+        CUDA.$fn(ptr, x)
+end
+@inline modify_native!(ptr::LLVMPtr{Float32}, ::typeof(+), x) = CUDA.atomic_add!(ptr, x)
+@inline modify_native!(ptr::LLVMPtr{Float32}, ::typeof(-), x) = CUDA.atomic_sub!(ptr, x)
+# Float64 atomic add needs compute capability 6.0; use compare-and-swap below that.
+@inline function modify_native!(ptr::LLVMPtr{Float64}, ::typeof(+), x)
+    if CUDA.compute_capability() >= v"6.0"
+        CUDA.atomic_add!(ptr, x)
+    else
+        modify_cas!(ptr, +, x)
+    end
+end
+@inline modify_native!(ptr::LLVMPtr{Float64}, ::typeof(-), x) = modify_native!(ptr, +, -x)
+
+# swap: exchange floats through their integer representation
+@inline modify_native!(ptr::LLVMPtr{<:NativeInt}, ::typeof(right), x) =
+    CUDA.atomic_xchg!(ptr, x)
+@inline function modify_native!(ptr::LLVMPtr{T,A}, ::typeof(right), x) where {T<:NativeFloat,A}
+    I = CUDA.inttype(T)
+    old = CUDA.atomic_xchg!(reinterpret(LLVMPtr{I,A}, ptr), reinterpret(I, x))
+    return reinterpret(T, old)
+end
+
+# everything else (float min/max, arbitrary functions): compare-and-swap loop
+@inline modify_native!(ptr::LLVMPtr, op, x) = modify_cas!(ptr, op, x)
+
+@inline function modify_cas!(ptr::LLVMPtr{T}, op, x) where {T}
+    old = Base.unsafe_load(ptr)
+    while true
+        new = convert(T, op(old, x))
+        seen = CUDA.atomic_cas!(ptr, old, new)
+        # bitwise comparison: `==` would spin forever on NaN
+        seen === old && return old
+        old = seen
+    end
 end
 
 end  # module AtomixCUDAExt

@@ -16,20 +16,6 @@ function metal(f)
 end
 
 
-# Not implemented:
-#=
-function test_get_set()
-    A = CUDA.ones(Int, 3)
-    cuda() do
-        GC.@preserve A begin
-            ref = Atomix.IndexableRef(A, (1,))
-            x = Atomix.get(ref)
-            Atomix.set!(ref, -x)
-        end
-    end
-    @test collect(A) == [-1, 1, 1]
-end
-=#
 
 
 @testset "AtomixMetalExt:test_cas" begin
@@ -94,4 +80,61 @@ end
         end
     end
     @test collect(A) == [2, 1, 1]
+end
+
+
+@testset "AtomixMetalExt:test_get_set" begin
+    A = Metal.ones(Int32, 3)
+    metal() do
+        GC.@preserve A begin
+            ref = Atomix.IndexableRef(A, (1,))
+            x = Atomix.get(ref)
+            Atomix.set!(ref, -x)
+            A[2] = @atomic A[1]
+            @atomic :monotonic A[3] = 2 * x
+        end
+    end
+    @test collect(A) == [-1, -1, 2]
+end
+
+
+@testset "AtomixMetalExt:test_swap" begin
+    A = Metal.MtlVector(Int32[1, 0, 0])
+    metal() do
+        GC.@preserve A begin
+            ref = Atomix.IndexableRef(A, (1,))
+            A[2] = Atomix.swap!(ref, Int32(5))
+            A[3] = @atomicswap A[1] = Int32(7)
+        end
+    end
+    @test collect(A) == [7, 1, 5]
+end
+
+
+@testset "AtomixMetalExt:test_ordering" begin
+    A = Metal.ones(Int32, 2)
+    metal() do
+        GC.@preserve A begin
+            @atomic :monotonic A[1] += 1
+            @atomic :acquire_release A[2] -= 1
+        end
+    end
+    @test collect(A) == [2, 0]
+end
+
+
+@testset "AtomixMetalExt:test_float" begin
+    A = Metal.MtlVector(Float32[1, 1, 1, 1, 1, 0])
+    metal() do
+        GC.@preserve A begin
+            @atomic A[1] += 1.5f0
+            @atomic A[2] -= 0.5f0
+            @atomic max(A[3], 3f0)
+            @atomic min(A[4], -1f0)
+            # no native instruction: compare-and-swap loop
+            pre, post = @atomic A[5] * 4f0
+            A[6] = pre + post
+        end
+    end
+    @test collect(A) == [2.5, 0.5, 3, -1, 4, 5]
 end
