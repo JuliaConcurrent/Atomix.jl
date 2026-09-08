@@ -48,7 +48,7 @@ end
 @inline modify_native!(ptr::LLVMPtr{Float32}, ::typeof(-), x) = CUDA.atomic_sub!(ptr, x)
 # Float64 atomic add needs compute capability 6.0; use compare-and-swap below that.
 @inline function modify_native!(ptr::LLVMPtr{Float64}, ::typeof(+), x)
-    if CUDA.compute_capability() >= v"6.0"
+    if CUDA.compute_capability().major >= 6
         CUDA.atomic_add!(ptr, x)
     else
         modify_cas!(ptr, +, x)
@@ -59,10 +59,11 @@ end
 # swap: exchange floats through their integer representation
 @inline modify_native!(ptr::LLVMPtr{<:NativeInt}, ::typeof(right), x) =
     CUDA.atomic_xchg!(ptr, x)
-@inline function modify_native!(ptr::LLVMPtr{T,A}, ::typeof(right), x) where {T<:NativeFloat,A}
-    I = CUDA.inttype(T)
-    old = CUDA.atomic_xchg!(reinterpret(LLVMPtr{I,A}, ptr), reinterpret(I, x))
-    return reinterpret(T, old)
+for (T, I) in [Float32 => UInt32, Float64 => UInt64]
+    @eval @inline function modify_native!(ptr::LLVMPtr{$T,A}, ::typeof(right), x) where {A}
+        old = CUDA.atomic_xchg!(reinterpret(LLVMPtr{$I,A}, ptr), reinterpret($I, x))
+        return reinterpret($T, old)
+    end
 end
 
 # everything else (float min/max, arbitrary functions): compare-and-swap loop

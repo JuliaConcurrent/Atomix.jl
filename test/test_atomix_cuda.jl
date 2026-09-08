@@ -108,7 +108,7 @@ end
 
 
 @testset "AtomixCUDAExt:test_float" begin
-    A = CUDA.CuVector(Float32[1, 1, 1, 1, 1, 0])
+    A = CUDA.CuVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
     cuda() do
         GC.@preserve A begin
             @atomic A[1] += 1.5f0
@@ -118,7 +118,25 @@ end
             # no native instruction: compare-and-swap loop
             pre, post = @atomic A[5] * 4f0
             A[6] = pre + post
+            A[7] = @atomicswap A[8] = 8f0
         end
     end
-    @test collect(A) == [2.5, 0.5, 3, -1, 4, 5]
+    @test collect(A) == [2.5, 0.5, 3, -1, 4, 5, 1, 8]
+end
+
+
+@testset "AtomixCUDAExt:test_float64" begin
+    A = CUDA.CuVector(Float64[1, 1, 1, 1, 1, 0, 0, 1])
+    cuda() do
+        GC.@preserve A begin
+            @atomic A[1] += 1.5
+            @atomic A[2] -= 0.5
+            @atomic max(A[3], 3.0)
+            @atomic min(A[4], -1.0)
+            pre, post = @atomic A[5] * 4.0
+            A[6] = pre + post
+            A[7] = @atomicswap A[8] = 8.0
+        end
+    end
+    @test collect(A) == [2.5, 0.5, 3, -1, 4, 5, 1, 8]
 end
