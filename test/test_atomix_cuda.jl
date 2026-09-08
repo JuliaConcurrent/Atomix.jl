@@ -1,5 +1,5 @@
-using CUDA
-using CUDA: @allowscalar
+using CUDACore
+using CUDACore: @allowscalar
 
 
 @testset "AtomixCUDACoreExt:extension_found" begin
@@ -12,7 +12,7 @@ function cuda(f)
         f()
         nothing
     end
-    CUDA.@cuda g()
+    @cuda g()
 end
 
 
@@ -28,7 +28,7 @@ end
     @assert minimum(idx) >= 1
     @assert maximum(idx) == length(idx)
 
-    A = CUDA.zeros(Int, length(idx))
+    A = CUDACore.zeros(Int, length(idx))
     cuda() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
@@ -43,7 +43,7 @@ end
 
 
 @testset "AtomixCUDACoreExt:test_inc" begin
-    A = CUDA.CuVector(1:3)
+    A = CuVector(1:3)
     cuda() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
@@ -57,7 +57,7 @@ end
 
 
 @testset "AtomixCUDACoreExt:test_inc_sugar" begin
-    A = CUDA.ones(Int, 3)
+    A = CUDACore.ones(Int, 3)
     cuda() do
         GC.@preserve A begin
             @atomic A[begin] += 1
@@ -68,7 +68,7 @@ end
 
 
 @testset "AtomixCUDACoreExt:test_get_set" begin
-    A = CUDA.ones(Int, 3)
+    A = CUDACore.ones(Int, 3)
     cuda() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
@@ -83,7 +83,7 @@ end
 
 
 @testset "AtomixCUDACoreExt:test_swap" begin
-    A = CUDA.CuVector(Int[1, 0, 0])
+    A = CuVector(Int[1, 0, 0])
     cuda() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
@@ -96,7 +96,7 @@ end
 
 
 @testset "AtomixCUDACoreExt:test_ordering" begin
-    A = CUDA.ones(Int, 2)
+    A = CUDACore.ones(Int, 2)
     cuda() do
         GC.@preserve A begin
             @atomic :monotonic A[1] += 1
@@ -108,7 +108,7 @@ end
 
 
 @testset "AtomixCUDACoreExt:test_float" begin
-    A = CUDA.CuVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
+    A = CuVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
     cuda() do
         GC.@preserve A begin
             @atomic A[1] += 1.5f0
@@ -126,7 +126,7 @@ end
 
 
 @testset "AtomixCUDACoreExt:test_float64" begin
-    A = CUDA.CuVector(Float64[1, 1, 1, 1, 1, 0, 0, 1])
+    A = CuVector(Float64[1, 1, 1, 1, 1, 0, 0, 1])
     cuda() do
         GC.@preserve A begin
             @atomic A[1] += 1.5
