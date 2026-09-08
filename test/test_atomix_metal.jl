@@ -124,7 +124,7 @@ end
 
 
 @testset "AtomixMetalExt:test_float" begin
-    A = Metal.MtlVector(Float32[1, 1, 1, 1, 1, 0])
+    A = Metal.MtlVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
     metal() do
         GC.@preserve A begin
             @atomic A[1] += 1.5f0
@@ -134,7 +134,8 @@ end
             # no native instruction: compare-and-swap loop
             pre, post = @atomic A[5] * 4f0
             A[6] = pre + post
+            A[7] = @atomicswap A[8] = 8f0
         end
     end
-    @test collect(A) == [2.5, 0.5, 3, -1, 4, 5]
+    @test collect(A) == [2.5, 0.5, 3, -1, 4, 5, 1, 8]
 end

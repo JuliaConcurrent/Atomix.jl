@@ -108,7 +108,7 @@ end
 
 
 @testset "AtomixoneAPIExt:test_float" begin
-    A = oneAPI.oneVector(Float32[1, 1, 1, 1, 1, 0])
+    A = oneAPI.oneVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
     oneapi() do
         GC.@preserve A begin
             @atomic A[1] += 1.5f0
@@ -118,7 +118,8 @@ end
             # no native instruction: compare-and-swap loop
             pre, post = @atomic A[5] * 4f0
             A[6] = pre + post
+            A[7] = @atomicswap A[8] = 8f0
         end
     end
-    @test collect(A) == [2.5, 0.5, 3, -1, 4, 5]
+    @test collect(A) == [2.5, 0.5, 3, -1, 4, 5, 1, 8]
 end
