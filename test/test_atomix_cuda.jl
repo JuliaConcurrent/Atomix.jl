@@ -1,9 +1,9 @@
-using CUDA
-using CUDA: @allowscalar
+using CUDACore
+using CUDACore: @allowscalar
 
 
-@testset "AtomixCUDAExt:extension_found" begin
-    @test !isnothing(Base.get_extension(Atomix, :AtomixCUDAExt))
+@testset "AtomixCUDACoreExt:extension_found" begin
+    @test !isnothing(Base.get_extension(Atomix, :AtomixCUDACoreExt))
 end
 
 
@@ -12,13 +12,13 @@ function cuda(f)
         f()
         nothing
     end
-    CUDA.@cuda g()
+    @cuda g()
 end
 
 
 
 
-@testset "AtomixCUDAExt:test_cas" begin
+@testset "AtomixCUDACoreExt:test_cas" begin
     idx = (
         data = 1,
         cas1_ok = 2,
@@ -28,7 +28,7 @@ end
     @assert minimum(idx) >= 1
     @assert maximum(idx) == length(idx)
 
-    A = CUDA.zeros(Int, length(idx))
+    A = CUDACore.zeros(Int, length(idx))
     cuda() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
@@ -42,8 +42,8 @@ end
 end
 
 
-@testset "AtomixCUDAExt:test_inc" begin
-    A = CUDA.CuVector(1:3)
+@testset "AtomixCUDACoreExt:test_inc" begin
+    A = CuVector(1:3)
     cuda() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
@@ -56,8 +56,8 @@ end
 end
 
 
-@testset "AtomixCUDAExt:test_inc_sugar" begin
-    A = CUDA.ones(Int, 3)
+@testset "AtomixCUDACoreExt:test_inc_sugar" begin
+    A = CUDACore.ones(Int, 3)
     cuda() do
         GC.@preserve A begin
             @atomic A[begin] += 1
@@ -67,8 +67,8 @@ end
 end
 
 
-@testset "AtomixCUDAExt:test_get_set" begin
-    A = CUDA.ones(Int, 3)
+@testset "AtomixCUDACoreExt:test_get_set" begin
+    A = CUDACore.ones(Int, 3)
     cuda() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
@@ -82,8 +82,8 @@ end
 end
 
 
-@testset "AtomixCUDAExt:test_swap" begin
-    A = CUDA.CuVector(Int[1, 0, 0])
+@testset "AtomixCUDACoreExt:test_swap" begin
+    A = CuVector(Int[1, 0, 0])
     cuda() do
         GC.@preserve A begin
             ref = Atomix.IndexableRef(A, (1,))
@@ -95,8 +95,8 @@ end
 end
 
 
-@testset "AtomixCUDAExt:test_ordering" begin
-    A = CUDA.ones(Int, 2)
+@testset "AtomixCUDACoreExt:test_ordering" begin
+    A = CUDACore.ones(Int, 2)
     cuda() do
         GC.@preserve A begin
             @atomic :monotonic A[1] += 1
@@ -107,8 +107,8 @@ end
 end
 
 
-@testset "AtomixCUDAExt:test_float" begin
-    A = CUDA.CuVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
+@testset "AtomixCUDACoreExt:test_float" begin
+    A = CuVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
     cuda() do
         GC.@preserve A begin
             @atomic A[1] += 1.5f0
@@ -125,8 +125,8 @@ end
 end
 
 
-@testset "AtomixCUDAExt:test_float64" begin
-    A = CUDA.CuVector(Float64[1, 1, 1, 1, 1, 0, 0, 1])
+@testset "AtomixCUDACoreExt:test_float64" begin
+    A = CuVector(Float64[1, 1, 1, 1, 1, 0, 0, 1])
     cuda() do
         GC.@preserve A begin
             @atomic A[1] += 1.5
