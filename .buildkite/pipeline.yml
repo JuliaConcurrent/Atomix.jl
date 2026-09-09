@@ -4,7 +4,7 @@ steps:
       setup:
         version:
           - "1.10"
-          - "1.11"
+          - "1.12"
     plugins:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
@@ -27,7 +27,7 @@ steps:
       setup:
         version:
           - "1.10"
-          - "1.11"
+          - "1.12"
     plugins:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
@@ -50,7 +50,7 @@ steps:
       setup:
         version:
           - "1.10"
-          - "1.11"
+          - "1.12"
     plugins:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
@@ -73,7 +73,7 @@ steps:
       setup:
         version:
           - "1.10"
-          - "1.11"
+          - "1.12"
     plugins:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
@@ -90,3 +90,6 @@ steps:
       queue: "metal"
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 15
+
+env:
+  JULIA_PKG_PRECOMPILE_AUTO: false
