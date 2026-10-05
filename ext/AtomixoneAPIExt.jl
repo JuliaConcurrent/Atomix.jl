@@ -7,7 +7,7 @@ using Core: LLVMPtr
 const oneIndexableRef{Indexable<:oneDeviceArray} = IndexableRef{Indexable}
 
 # `Atomix.get` and `Atomix.set!` use Atomix's generic implementation: an LLVM atomic
-# load/store on the device pointer (via UnsafeAtomicsLLVM), which honors the ordering.
+# load/store on the device pointer, which honors the ordering.
 #
 # `Atomix.replace!` and `Atomix.modify!` go through oneAPI.jl's SPIR-V intrinsics. These
 # have no ordering parameter, so the requested ordering is ignored: every operation is

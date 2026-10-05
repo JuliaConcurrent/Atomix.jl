@@ -137,9 +137,12 @@ end
 # Pass command-line argument to test suite to install the right backend, e.g.
 #   julia> import Pkg
 #   julia> Pkg.test("Atomix", test_args=["--Metal"])
+#
+# Metal.jl, oneAPI.jl and OpenCL.jl have no release yet that supports LLVM.jl 10, which
+# UnsafeAtomics 0.4 requires, so test against their development versions for now.
 if "--Metal" in ARGS
     import Pkg
-    Pkg.add("Metal")
+    Pkg.add(url="https://github.com/JuliaGPU/Metal.jl", rev="main")
     include("test_atomix_metal.jl")
 elseif "--CUDA" in ARGS
     import Pkg
@@ -147,10 +150,11 @@ elseif "--CUDA" in ARGS
     include("test_atomix_cuda.jl")
 elseif "--oneAPI" in ARGS
     import Pkg
-    Pkg.add("oneAPI")
+    Pkg.add(url="https://github.com/JuliaGPU/oneAPI.jl", rev="main")
     include("test_atomix_oneapi.jl")
 elseif "--OpenCL" in ARGS
     import Pkg
-    Pkg.add(["OpenCL", "pocl_jll"])
+    Pkg.add([Pkg.PackageSpec(url="https://github.com/JuliaGPU/OpenCL.jl", rev="main"),
+             Pkg.PackageSpec(name="pocl_jll")])
     include("test_atomix_opencl.jl")
 end
