@@ -2,11 +2,6 @@ using Metal
 using Metal: @allowscalar
 
 
-@testset "AtomixMetalExt:extension_found" begin
-    @test !isnothing(Base.get_extension(Atomix, :AtomixMetalExt))
-end
-
-
 function metal(f)
     function g()
         f()
@@ -18,7 +13,7 @@ end
 
 
 
-@testset "AtomixMetalExt:test_cas" begin
+@testset "Metal:test_cas" begin
     idx = (
         data = 1,
         cas1_ok = 2,
@@ -42,7 +37,7 @@ end
 end
 
 
-@testset "AtomixMetalExt:test_inc" begin
+@testset "Metal:test_inc" begin
     A = Metal.MtlVector(Int32(1):Int32(3))
     metal() do
         GC.@preserve A begin
@@ -55,7 +50,7 @@ end
     @test collect(A) == [2, 1, 2]
 end
 
-@testset "AtomixMetalExt:test_inc_threadgroup" begin
+@testset "Metal:test_inc_threadgroup" begin
     A = Metal.MtlVector(Float32(1):Float32(3))
     metal() do
         GC.@preserve A begin
@@ -72,7 +67,7 @@ end
 end
 
 
-@testset "AtomixMetalExt:test_inc_sugar" begin
+@testset "Metal:test_inc_sugar" begin
     A = Metal.ones(Int32, 3)
     metal() do
         GC.@preserve A begin
@@ -83,7 +78,7 @@ end
 end
 
 
-@testset "AtomixMetalExt:test_get_set" begin
+@testset "Metal:test_get_set" begin
     A = Metal.ones(Int32, 3)
     metal() do
         GC.@preserve A begin
@@ -98,7 +93,7 @@ end
 end
 
 
-@testset "AtomixMetalExt:test_swap" begin
+@testset "Metal:test_swap" begin
     A = Metal.MtlVector(Int32[1, 0, 0])
     metal() do
         GC.@preserve A begin
@@ -111,7 +106,7 @@ end
 end
 
 
-@testset "AtomixMetalExt:test_ordering" begin
+@testset "Metal:test_ordering" begin
     A = Metal.ones(Int32, 2)
     metal() do
         GC.@preserve A begin
@@ -123,7 +118,7 @@ end
 end
 
 
-@testset "AtomixMetalExt:test_float" begin
+@testset "Metal:test_float" begin
     A = Metal.MtlVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
     metal() do
         GC.@preserve A begin
