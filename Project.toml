@@ -1,7 +1,7 @@
 name = "Atomix"
 uuid = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
-version = "1.5.0"
+version = "1.6.0"
 
 [deps]
 UnsafeAtomics = "013be700-e6cd-48c3-b4a1-df204f14c38f"
@@ -13,13 +13,12 @@ oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
 OpenCL = "08131aa3-fb12-5dee-8b74-c09406e224a2"
 
 [extensions]
-AtomixCUDACoreExt = "CUDACore"
 AtomixoneAPIExt = "oneAPI"
 AtomixOpenCLExt = "OpenCL"
 
 [compat]
 CUDA = "6"
-CUDACore = "6"
+CUDACore = "6.5"
 oneAPI = "1, 2"
 OpenCL = "^0.10"
 UnsafeAtomics = "0.4"
