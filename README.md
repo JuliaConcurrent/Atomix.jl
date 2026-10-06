@@ -30,3 +30,7 @@ julia> @atomicswap A[end] = 123
 julia> A[end]
 123
 ```
+
+Atomic operations on GPU arrays are atomic with respect to the threads of the device,
+like the plain atomics of CUDA C or HIP. They are not guaranteed to be atomic with respect
+to the host or other devices accessing the same memory.

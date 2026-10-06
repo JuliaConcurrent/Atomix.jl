@@ -2,6 +2,7 @@ using Atomix
 using Atomix.Internal: referenceable
 using Atomix: @atomic, @atomicreplace, @atomicswap
 using Test
+using InteractiveUtils: code_llvm
 
 
 @testset "Aqua.jl" begin
@@ -23,6 +24,15 @@ end
     @test Atomix.get(ref) === 345
     @test Atomix.replace!(ref, 345, 567) === (old = 345, success = true)
     @test Atomix.replace!(ref, 345, 567) === (old = 567, success = false)
+end
+
+
+@testset "test_host_scope" begin
+    # on the host, device-scope atomics are system-scope ones
+    f(A) = Atomix.modify!(Atomix.IndexableRef(A, (1,)), +, 1)
+    ir = sprint(code_llvm, f, Tuple{Vector{Int}})
+    @test occursin("atomicrmw add", ir)
+    @test !occursin("syncscope", ir)
 end
 
 
