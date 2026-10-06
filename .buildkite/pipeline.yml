@@ -12,7 +12,7 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
-                Pkg.add("CUDA")
+                Pkg.add("CUDACore")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")

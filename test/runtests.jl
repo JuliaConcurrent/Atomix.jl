@@ -146,7 +146,7 @@ if "--Metal" in ARGS
     include("test_atomix_metal.jl")
 elseif "--CUDA" in ARGS
     import Pkg
-    Pkg.add("CUDA")
+    Pkg.add("CUDACore")
     include("test_atomix_cuda.jl")
 elseif "--oneAPI" in ARGS
     import Pkg
