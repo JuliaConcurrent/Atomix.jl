@@ -17,9 +17,9 @@ AtomixoneAPIExt = "oneAPI"
 AtomixOpenCLExt = "OpenCL"
 
 [compat]
-CUDA = "6"
-CUDACore = "6.5"
-oneAPI = "1, 2"
+CUDA = "6, 7"
+CUDACore = "6.5, 7"
+oneAPI = "1, 2, 3"
 OpenCL = "0.10, 0.11"
 UnsafeAtomics = "0.4"
 julia = "1.10"
