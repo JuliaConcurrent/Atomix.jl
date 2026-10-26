@@ -148,11 +148,12 @@ end
 #   julia> import Pkg
 #   julia> Pkg.test("Atomix", test_args=["--Metal"])
 #
-# Metal.jl, oneAPI.jl and OpenCL.jl have no release yet that supports LLVM.jl 10, which
-# UnsafeAtomics 0.4 requires, so test against their development versions for now.
+# oneAPI.jl 2.10 and OpenCL.jl 1.0, the first releases that support LLVM.jl 10 (which
+# UnsafeAtomics 0.4 requires), are not registered yet, so test against their development
+# versions for now.
 if "--Metal" in ARGS
     import Pkg
-    Pkg.add(url="https://github.com/JuliaGPU/Metal.jl", rev="main")
+    Pkg.add("Metal")
     include("test_atomix_metal.jl")
 elseif "--CUDA" in ARGS
     import Pkg

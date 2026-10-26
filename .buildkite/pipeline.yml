@@ -12,8 +12,8 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
-                Pkg.add("CUDACore")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
+                Pkg.add("CUDACore")
 
                 println("+++ :julia: Running tests")
                 Pkg.test("Atomix", test_args=["--CUDA"])'
@@ -35,8 +35,8 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
-                Pkg.add(url="https://github.com/JuliaGPU/oneAPI.jl", rev="main")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
+                Pkg.add(url="https://github.com/JuliaGPU/oneAPI.jl", rev="main")
 
                 println("+++ :julia: Running tests")
                 Pkg.test("Atomix", test_args=["--oneAPI"])'
@@ -58,9 +58,9 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
+                Pkg.develop(PackageSpec(name="Atomix", path="."))
                 Pkg.add([PackageSpec(url="https://github.com/JuliaGPU/OpenCL.jl", rev="main"),
                          PackageSpec(name="pocl_jll")])
-                Pkg.develop(PackageSpec(name="Atomix", path="."))
 
                 println("+++ :julia: Running tests")
                 Pkg.test("Atomix", test_args=["--OpenCL"])'
@@ -82,8 +82,8 @@ steps:
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
-                Pkg.add(url="https://github.com/JuliaGPU/Metal.jl", rev="main")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
+                Pkg.add("Metal")
 
                 println("+++ :julia: Running tests")
                 Pkg.test("Atomix", test_args=["--Metal"])'
