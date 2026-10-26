@@ -2,8 +2,9 @@ using OpenCL, pocl_jll
 using OpenCL: @allowscalar
 cl.platform!("pocl")
 
-@testset "AtomixOpenCLExt:extension_found" begin
-    @test !isnothing(Base.get_extension(Atomix, :AtomixOpenCLExt))
+# OpenCL arrays use the generic implementation on top of UnsafeAtomics
+@testset "OpenCL:no_extension" begin
+    @test isnothing(Base.get_extension(Atomix, :AtomixOpenCLExt))
 end
 
 
@@ -18,7 +19,7 @@ end
 
 
 
-@testset "AtomixOpenCLExt:test_cas" begin
+@testset "OpenCL:test_cas" begin
     idx = (
         data = 1,
         cas1_ok = 2,
@@ -42,7 +43,7 @@ end
 end
 
 
-@testset "AtomixOpenCLExt:test_inc" begin
+@testset "OpenCL:test_inc" begin
     A = OpenCL.CLArray(Int32(1):Int32(3))
     opencl() do
         GC.@preserve A begin
@@ -56,7 +57,7 @@ end
 end
 
 
-@testset "AtomixOpenCLExt:test_inc_sugar" begin
+@testset "OpenCL:test_inc_sugar" begin
     A = OpenCL.ones(Int32, 3)
     opencl() do
         GC.@preserve A begin
@@ -67,7 +68,7 @@ end
 end
 
 
-@testset "AtomixOpenCLExt:test_get_set" begin
+@testset "OpenCL:test_get_set" begin
     A = OpenCL.ones(Int32, 3)
     opencl() do
         GC.@preserve A begin
@@ -82,7 +83,7 @@ end
 end
 
 
-@testset "AtomixOpenCLExt:test_swap" begin
+@testset "OpenCL:test_swap" begin
     A = OpenCL.CLArray(Int32[1, 0, 0])
     opencl() do
         GC.@preserve A begin
@@ -95,7 +96,7 @@ end
 end
 
 
-@testset "AtomixOpenCLExt:test_ordering" begin
+@testset "OpenCL:test_ordering" begin
     A = OpenCL.ones(Int32, 2)
     opencl() do
         GC.@preserve A begin
@@ -107,7 +108,7 @@ end
 end
 
 
-@testset "AtomixOpenCLExt:test_float" begin
+@testset "OpenCL:test_float" begin
     A = OpenCL.CLArray(Float32[1, 1, 1, 1, 1, 0, 0, 1])
     opencl() do
         GC.@preserve A begin
@@ -125,7 +126,7 @@ end
 end
 
 
-@testset "AtomixOpenCLExt:test_float64" begin
+@testset "OpenCL:test_float64" begin
     A = OpenCL.CLArray(Float64[1, 1, 1, 1, 1, 0, 0, 1])
     opencl() do
         GC.@preserve A begin

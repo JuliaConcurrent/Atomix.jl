@@ -2,8 +2,9 @@ using oneAPI
 using oneAPI: @allowscalar
 
 
-@testset "AtomixoneAPIExt:extension_found" begin
-    @test !isnothing(Base.get_extension(Atomix, :AtomixoneAPIExt))
+# oneAPI arrays use the generic implementation on top of UnsafeAtomics
+@testset "oneAPI:no_extension" begin
+    @test isnothing(Base.get_extension(Atomix, :AtomixoneAPIExt))
 end
 
 
@@ -18,7 +19,7 @@ end
 
 
 
-@testset "AtomixoneAPIExt:test_cas" begin
+@testset "oneAPI:test_cas" begin
     idx = (
         data = 1,
         cas1_ok = 2,
@@ -42,7 +43,7 @@ end
 end
 
 
-@testset "AtomixoneAPIExt:test_inc" begin
+@testset "oneAPI:test_inc" begin
     A = oneAPI.oneVector(Int32(1):Int32(3))
     oneapi() do
         GC.@preserve A begin
@@ -56,7 +57,7 @@ end
 end
 
 
-@testset "AtomixoneAPIExt:test_inc_sugar" begin
+@testset "oneAPI:test_inc_sugar" begin
     A = oneAPI.ones(Int32, 3)
     oneapi() do
         GC.@preserve A begin
@@ -67,7 +68,7 @@ end
 end
 
 
-@testset "AtomixoneAPIExt:test_get_set" begin
+@testset "oneAPI:test_get_set" begin
     A = oneAPI.ones(Int32, 3)
     oneapi() do
         GC.@preserve A begin
@@ -82,7 +83,7 @@ end
 end
 
 
-@testset "AtomixoneAPIExt:test_swap" begin
+@testset "oneAPI:test_swap" begin
     A = oneAPI.oneVector(Int32[1, 0, 0])
     oneapi() do
         GC.@preserve A begin
@@ -95,7 +96,7 @@ end
 end
 
 
-@testset "AtomixoneAPIExt:test_ordering" begin
+@testset "oneAPI:test_ordering" begin
     A = oneAPI.ones(Int32, 2)
     oneapi() do
         GC.@preserve A begin
@@ -107,7 +108,7 @@ end
 end
 
 
-@testset "AtomixoneAPIExt:test_float" begin
+@testset "oneAPI:test_float" begin
     A = oneAPI.oneVector(Float32[1, 1, 1, 1, 1, 0, 0, 1])
     oneapi() do
         GC.@preserve A begin
