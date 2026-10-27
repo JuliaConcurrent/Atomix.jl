@@ -143,29 +143,13 @@ end
 end
 
 
-# KernelAbstractions backend tests
-# Pass command-line argument to test suite to install the right backend, e.g.
-#   julia> import Pkg
-#   julia> Pkg.test("Atomix", test_args=["--Metal"])
-#
-# oneAPI.jl 2.10 and OpenCL.jl 1.0, the first releases that support LLVM.jl 10 (which
-# UnsafeAtomics 0.4 requires), are not registered yet, so test against their development
-# versions for now.
-if "--Metal" in ARGS
-    import Pkg
-    Pkg.add("Metal")
-    include("test_atomix_metal.jl")
-elseif "--CUDA" in ARGS
-    import Pkg
-    Pkg.add("CUDACore")
-    include("test_atomix_cuda.jl")
-elseif "--oneAPI" in ARGS
-    import Pkg
-    Pkg.add(url="https://github.com/JuliaGPU/oneAPI.jl", rev="main")
-    include("test_atomix_oneapi.jl")
-elseif "--OpenCL" in ARGS
-    import Pkg
-    Pkg.add([Pkg.PackageSpec(url="https://github.com/JuliaGPU/OpenCL.jl", rev="main"),
-             Pkg.PackageSpec(name="pocl_jll")])
-    include("test_atomix_opencl.jl")
-end
+# GPU back-ends are tested when present in the test environment, which requires having
+# explicitly promoted them from weak to regular dependencies (see test/promote.jl), e.g.
+#   $ julia test/promote.jl metal
+#   $ julia --project -e 'import Pkg; Pkg.test()'
+in_test_env(pkg) = Base.identify_package(pkg) !== nothing
+
+in_test_env("CUDACore") && include("test_atomix_cuda.jl")
+in_test_env("Metal") && include("test_atomix_metal.jl")
+in_test_env("oneAPI") && include("test_atomix_oneapi.jl")
+in_test_env("OpenCL") && include("test_atomix_opencl.jl")

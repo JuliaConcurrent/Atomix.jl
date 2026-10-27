@@ -9,14 +9,14 @@ steps:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
     command: |
+      julia test/promote.jl cuda
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
-                Pkg.add("CUDACore")
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--CUDA"])'
+                Pkg.test("Atomix")'
     agents:
       queue: "cuda"
     if: build.message !~ /\[skip tests\]/
@@ -32,14 +32,14 @@ steps:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
     command: |
+      julia test/promote.jl oneapi
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
-                Pkg.add(url="https://github.com/JuliaGPU/oneAPI.jl", rev="main")
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--oneAPI"])'
+                Pkg.test("Atomix")'
     agents:
       queue: "oneapi"
     if: build.message !~ /\[skip tests\]/
@@ -55,15 +55,14 @@ steps:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
     command: |
+      julia test/promote.jl opencl
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
-                Pkg.add([PackageSpec(url="https://github.com/JuliaGPU/OpenCL.jl", rev="main"),
-                         PackageSpec(name="pocl_jll")])
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--OpenCL"])'
+                Pkg.test("Atomix")'
     agents:
       queue: "oneapi"
     if: build.message !~ /\[skip tests\]/
@@ -79,14 +78,14 @@ steps:
       - JuliaCI/julia#v1:
           version: "{{matrix.version}}"
     command: |
+      julia test/promote.jl metal
       julia -e 'using Pkg
 
                 println("--- :julia: Instantiating environment")
                 Pkg.develop(PackageSpec(name="Atomix", path="."))
-                Pkg.add("Metal")
 
                 println("+++ :julia: Running tests")
-                Pkg.test("Atomix", test_args=["--Metal"])'
+                Pkg.test("Atomix")'
     agents:
       queue: "metal"
     if: build.message !~ /\[skip tests\]/
